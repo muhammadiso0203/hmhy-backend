@@ -4,6 +4,7 @@ import { AdminController } from "./admin.controller";
 import { AdminService } from "./admin.service";
 import { Admin } from "./entities/admin.entity";
 import { JwtModule } from "@nestjs/jwt";
+import { CryptoService } from "src/common/crypto/cryptoService";
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { JwtModule } from "@nestjs/jwt";
     }),
   ],
   controllers: [AdminController],
-  providers: [AdminService],
+  providers: [AdminService, CryptoService],
   exports: [AdminService],
 })
 export class AdminModule {}

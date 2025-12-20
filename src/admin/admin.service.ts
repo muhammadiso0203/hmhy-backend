@@ -1,3 +1,4 @@
+import { CryptoService } from '../common/crypto/cryptoService';
 import {
   Injectable,
   NotFoundException,
@@ -10,13 +11,36 @@ import { Admin } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { UpdateAdminDto } from "./dto/update-admin.dto";
 import { RolesEnum } from "src/common/enum";
+import { appConfig } from "src/config/congif";
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(Admin)
-    private readonly adminRepository: Repository<Admin>
+    private readonly adminRepository: Repository<Admin>,
+    private readonly crypto: CryptoService,
   ) {}
+
+  async onModuleInit() {
+    const superAdmin = await this.adminRepository.findOne({
+      where: { role: RolesEnum.SUPER_ADMIN },
+    });
+    if (!superAdmin) {
+      const password = await this.crypto.encrypt(
+        appConfig.SUPER_ADMIN.PASSWORD,
+      );
+      const data = this.adminRepository.create({
+        username: appConfig.SUPER_ADMIN.USERNAME,
+        password,
+        role: RolesEnum.SUPER_ADMIN,
+        phoneNumber: appConfig.SUPER_ADMIN.PHONENUMBER || '',
+      });
+      await this.adminRepository.save(data);
+      console.log('Super Admin created');
+    } else {
+      console.log('Super Admin already exists');
+    }
+  }
 
   async create(createAdminDto: CreateAdminDto) {
     const { username, password } = createAdminDto;
