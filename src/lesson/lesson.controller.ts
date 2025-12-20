@@ -9,12 +9,12 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiTags, ApiResponse } from "@nestjs/swagger";
-import { CreateLessonDto } from "./dto/create-lesson.dto";
-import { UpdateLessonDto } from "./dto/update-lesson.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { Roles } from "../common/decorators/roles.decorator";
 import { LessonService } from "./lesson.service";
+import { UpdateLessonDto } from "./dto/update-lesson.dto";
+import { CreateLessonDto } from "./dto/create-lesson.dto";
 
 @ApiTags("lessons")
 @Controller("lessons")

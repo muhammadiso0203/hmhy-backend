@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString,IsNumber, IsBoolean, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsNumber, IsEnum, MinLength, IsBoolean, IsArray } from 'class-validator';
 
-export class UpdateTeacherDto {
+export class UpdateTeacherMeDto {
   @ApiPropertyOptional({
     example: 'John Doe',
     description: 'Full name of the teacher',
@@ -92,45 +92,5 @@ export class UpdateTeacherDto {
   @IsString({ each: true })
   lessons?: string[];
 
-  @ApiPropertyOptional({
-    example: 'string',
-    description: 'Google ID',
-  })
-  @IsOptional()
-  @IsString()
-  googleId?: string;
-
-  @ApiPropertyOptional({
-    example: 'string',
-    description: 'Google refresh token',
-  })
-  @IsOptional()
-  @IsString()
-  googleRefreshToken?: string;
-
-  @ApiPropertyOptional({
-    example: 'string',
-    description: 'Google access token',
-  })
-  @IsOptional()
-  @IsString()
-  googleAccessToken?: string;
-
-  @ApiPropertyOptional({
-    example: 0,
-    description: 'Rating',
-  })
-  @IsOptional()
-  @IsNumber()
-  rating?: number;
-
-  @ApiPropertyOptional({
-    example: true,
-    description: 'Is active',
-  })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-
-  
 }
+

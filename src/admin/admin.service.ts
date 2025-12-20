@@ -6,9 +6,10 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { Admin, UserRole } from "./entities/admin.entity";
+import { Admin } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { UpdateAdminDto } from "./dto/update-admin.dto";
+import { RolesEnum } from "src/common/enum";
 
 @Injectable()
 export class AdminService {
@@ -30,7 +31,7 @@ export class AdminService {
     const newAdmin = this.adminRepository.create({
       username,
       password: hashedPassword,
-      role: UserRole.ADMIN, // Faqat username/password keladi, role doim ADMIN bo'ladi
+      role: RolesEnum.ADMIN, // Faqat username/password keladi, role doim ADMIN bo'ladi
     });
 
     return await this.adminRepository.save(newAdmin);

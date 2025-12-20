@@ -7,11 +7,8 @@ import {
   OneToMany,
 } from "typeorm";
 import { DeletedTeacher } from "../../deletedTeacher/entities/deletedTeacher.entity";
+import { RolesEnum } from "src/common/enum";
 
-export enum UserRole {
-  ADMIN = "admin",
-  SUPERADMIN = "superadmin",
-}
 
 @Entity("admin")
 export class Admin {
@@ -39,8 +36,8 @@ export class Admin {
   @Column({ default: false })
   isDelete: boolean;
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.ADMIN })
-  role: UserRole;
+  @Column({ type: "enum", enum: RolesEnum, default: RolesEnum.ADMIN })
+  role: RolesEnum;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -15,12 +15,12 @@ import {
   ApiBearerAuth,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
-import { UserRole } from "./entities/admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { UpdateAdminDto } from "./dto/update-admin.dto";
 import { AdminService } from "./admin.service";
 import { Roles } from "../common/decorators/roles.decorator";
 import { RolesGuard } from "../common/guards/roles.guard";
+import { RolesEnum } from "src/common/enum";
 
 @ApiTags("Admin")
 @ApiBearerAuth() 
@@ -29,7 +29,7 @@ import { RolesGuard } from "../common/guards/roles.guard";
 export class AdminController {
   constructor(private readonly adminsService: AdminService) {}
 
-  @Roles(UserRole.SUPERADMIN) 
+  @Roles(RolesEnum.SUPER_ADMIN) 
   @ApiOperation({ summary: "Yangi admin yaratish (Faqat SuperAdmin uchun)" })
   @ApiResponse({ status: 201, description: "Admin muvaffaqiyatli yaratildi" })
   @Post()
@@ -37,7 +37,7 @@ export class AdminController {
     return this.adminsService.create(createAdminDto);
   }
 
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(RolesEnum.SUPER_ADMIN, RolesEnum.ADMIN)
   @ApiOperation({ summary: "Barcha adminlarni olish" })
   @ApiResponse({ status: 200, description: "Adminlar ro'yxati" })
   @Get()
@@ -45,21 +45,21 @@ export class AdminController {
     return this.adminsService.findAll();
   }
 
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(RolesEnum.SUPER_ADMIN, RolesEnum.ADMIN)
   @ApiOperation({ summary: "ID bo'yicha bitta adminni olish" })
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.adminsService.findOne(id);
   }
 
-  @Roles(UserRole.SUPERADMIN) 
+  @Roles(RolesEnum.SUPER_ADMIN) 
   @ApiOperation({ summary: "Admin ma'lumotlarini yangilash" })
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminsService.update(id, updateAdminDto);
   }
 
-  @Roles(UserRole.SUPERADMIN)
+  @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Adminni o'chirish" })
   @Delete(":id")
   remove(@Param("id") id: string) {

@@ -7,14 +7,14 @@ import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
 import * as bcrypt from "bcrypt";
 
-import { TeachersService } from "../../teacher/teacher.service";
 import { Teacher } from "../../teacher/entities/teacher.entity";
 import { SignInDto } from "../dto/sign-in.dto";
+import { TeacherService } from "src/teacher/teacher.service";
 
 @Injectable()
 export class AuthTeacherService {
   constructor(
-    private readonly teachersService: TeachersService,
+    private readonly teachersService: TeacherService,
     private readonly jwtService: JwtService
   ) {}
 
@@ -84,15 +84,19 @@ export class AuthTeacherService {
   }
 
   async refreshToken(teacherId: string, refresh_token: string, res: Response) {
-    const teacher = await this.teachersService.findOne(teacherId);
+    const teacher = await this.teachersService.findOneWithRefreshToken(teacherId);
 
-    if (!teacher || !teacher.refreshToken) {
+    if (!teacher || !teacher.data) {
+      throw new ForbiddenException("Ruxsat etilmagan (Token topilmadi)");
+    }
+
+    if (!teacher.data.refreshToken) {
       throw new ForbiddenException("Ruxsat etilmagan (Token topilmadi)");
     }
 
     const tokenMatch = await bcrypt.compare(
       refresh_token,
-      teacher.refreshToken
+      teacher.data.refreshToken
     );
 
     if (!tokenMatch) {
@@ -100,17 +104,18 @@ export class AuthTeacherService {
     }
 
     const { accessToken, refreshToken: newRefreshToken } =
-      await this.generateTokens(teacher);
+      await this.generateTokens(teacher.data);
 
     const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 7);
     await this.teachersService.updateRefreshToken(
-      teacher.id,
+      teacher.data.id,
       hashedRefreshToken
     );
 
     res.cookie("refresh_token", newRefreshToken, {
       maxAge: Number(process.env.COOKIE_TIME),
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
     });
 
     return {

@@ -8,18 +8,18 @@ import {
   Delete,
   UseGuards,
 } from "@nestjs/common";
-import { CreateTeacherDto } from "./dto/create-lesson-history.dto";
-import { UpdateTeacherDto } from "./dto/update-lesson-history.dto";
 import { ApiOperation, ApiTags, ApiResponse } from "@nestjs/swagger";
-import { TeachersService } from "./lessonHistory.service";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { AdminGuard } from "../common/guards/admin.guard";
 import { JwtSelfGuard } from "../common/guards/jwt-self.guard";
+import { LessonHistoryService } from "./lessonHistory.service";
+import { CreateLessonHistoryDto } from "./dto/create-lesson-history.dto";
+import { UpdateLessonHistoryDto } from "./dto/update-lesson-history.dto";
 
 @ApiTags("teachers")
 @Controller("teachers")
 export class TeachersController {
-  constructor(private readonly teachersService: TeachersService) {}
+  constructor(private readonly teachersService: LessonHistoryService) {}
 
   //   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOperation({ summary: "Yangi o'qituvchi qo'shish" })
@@ -29,8 +29,8 @@ export class TeachersController {
   })
   @ApiResponse({ status: 400, description: "Yaroqsiz ma'lumotlar" })
   @Post()
-  create(@Body() createTeacherDto: CreateTeacherDto) {
-    return this.teachersService.create(createTeacherDto);
+  create(@Body() createLessonHistoryDto: CreateLessonHistoryDto) {
+    return this.teachersService.create(createLessonHistoryDto);
   }
 
   //   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -54,8 +54,8 @@ export class TeachersController {
   @ApiOperation({ summary: "ID bo'yicha o'qituvchini yangilash" })
   @ApiResponse({ status: 200, description: "O'qituvchi yangilandi" })
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
-    return this.teachersService.update(id, updateTeacherDto);
+  update(@Param("id") id: string, @Body() updateLessonHistoryDto: UpdateLessonHistoryDto) {
+    return this.teachersService.update(id, updateLessonHistoryDto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)

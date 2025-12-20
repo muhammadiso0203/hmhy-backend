@@ -7,24 +7,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { LessonTemplate } from "../../lessonTemplate/entities/lessonTemplate.entity";
-import { DeletedTeacher } from "../../deletedTeacher/entities/deletedTeacher.entity";
-import { Lesson } from "../../lesson/entities/lesson.entity";
-
-export enum UserRole {
-  TEACHER = "teacher",
-  ADMIN = "admin",
-}
-
-export enum Specification {
-  RUSSIAN = "russian",
-  ENGLISH = "english",
-  SPANISH = "spanish",
-  ARABIC = "arabic",
-  KOREAN = "korean",
-  CHINESE = "chinese",
-  GERMAN = "german",
-  FRENCH = "french",
-}
+import { TeacherRole, TeacherSpecification } from "src/common/enum";
 
 @Entity("teachers")
 export class Teacher {
@@ -55,11 +38,11 @@ export class Teacher {
   @Column({ default: false })
   isDelete: boolean;
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.TEACHER })
-  role: UserRole;
+  @Column({ type: "enum", enum: TeacherRole, default: TeacherRole.TEACHER })
+  role: TeacherRole;
 
-  @Column({ type: "enum", enum: Specification, nullable: true })
-  specification: Specification;
+  @Column({ type: "enum", enum: TeacherSpecification, nullable: true })
+  specification: TeacherSpecification;
 
   @Column({ nullable: true })
   level: string;

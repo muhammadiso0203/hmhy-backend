@@ -1,74 +1,50 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateTeacherDto } from "./dto/create-lesson-history.dto";
-import { UpdateTeacherDto } from "./dto/update-lesson-history.dto";
-import * as bcrypt from "bcrypt";
-import { Teacher } from "./entities/lessonHistory.entity";
+import { CreateLessonHistoryDto } from "./dto/create-lesson-history.dto";
+import { UpdateLessonHistoryDto } from "./dto/update-lesson-history.dto";
+import { LessonHistory } from "./entities/lessonHistory.entity";
 
 @Injectable()
-export class TeachersService {
+export class LessonHistoryService {
   constructor(
-    @InjectRepository(Teacher)
-    private readonly teacherRepository: Repository<Teacher>
+    @InjectRepository(LessonHistory)
+    private readonly lessonHistoryRepository: Repository<LessonHistory>
   ) {}
 
-  async create(createTeacherDto: CreateTeacherDto) {
-    const { password } = createTeacherDto;
-    const hashed_password = await bcrypt.hash(password, 7);
-
-    const newTeacher = this.teacherRepository.create({
-      ...createTeacherDto,
-      password: hashed_password,
-    });
-
-    return await this.teacherRepository.save(newTeacher);
+  async create(createDto: CreateLessonHistoryDto) {
+    const newHistory = this.lessonHistoryRepository.create(createDto);
+    return await this.lessonHistoryRepository.save(newHistory);
   }
 
   async findAll() {
-    return await this.teacherRepository.find({
-      where: { isDelete: false },
+    return await this.lessonHistoryRepository.find({
+      relations: ["lesson", "teacher", "student"],
     });
   }
 
   async findOne(id: string) {
-    const teacher = await this.teacherRepository.findOneBy({
-      id,
-      isDelete: false,
+    const history = await this.lessonHistoryRepository.findOne({
+      where: { id },
+      relations: ["lesson", "teacher", "student"],
     });
-    if (!teacher) {
-      throw new NotFoundException(`O'qituvchi ID=${id} topilmadi`);
+
+    if (!history) {
+      throw new NotFoundException(`Dars tarixi ID=${id} topilmadi`);
     }
-    return teacher;
+
+    return history;
   }
 
-  async findTeacherByEmail(email: string) {
-    const teacher = await this.teacherRepository.findOneBy({
-      email,
-      isDelete: false,
-    });
-    if (!teacher) {
-      throw new NotFoundException(`O'qituvchi ${email} topilmadi`);
-    }
-    return teacher;
-  }
-
-  async update(id: string, updateTeacherDto: UpdateTeacherDto) {
-    const teacher = await this.findOne(id);
-    Object.assign(teacher, updateTeacherDto);
-    return await this.teacherRepository.save(teacher);
+  async update(id: string, updateDto: UpdateLessonHistoryDto) {
+    const history = await this.findOne(id);
+    Object.assign(history, updateDto);
+    return await this.lessonHistoryRepository.save(history);
   }
 
   async remove(id: string) {
-    const teacher = await this.findOne(id);
-    teacher.isDelete = true;
-    await this.teacherRepository.save(teacher);
-    return { message: "Teacher soft-deleted successfully" };
-  }
-
-  async updateRefreshToken(id: string, hashedToken: string | null) {
-    return await this.teacherRepository.update(id, {
-      refreshToken: hashedToken ?? undefined,
-    });
+    const history = await this.findOne(id);
+    await this.lessonHistoryRepository.remove(history);
+    return { message: "Dars tarixi muvaffaqiyatli o'chirildi" };
   }
 }

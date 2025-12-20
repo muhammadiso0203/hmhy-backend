@@ -2,101 +2,47 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from "typeorm";
-import { LessonTemplate } from "../../lessonTemplate/entities/lessonTemplate.entity";
-import { DeletedTeacher } from "../../deletedTeacher/entities/deletedTeacher.entity";
-import { Lesson } from "../../lesson/entities/lesson.entity";
 
-export enum UserRole {
-  TEACHER = "teacher",
-  ADMIN = "admin",
-}
-
-export enum Specification {
-  RUSSIAN = "russian",
-  ENGLISH = "english",
-  SPANISH = "spanish",
-  ARABIC = "arabic",
-  KOREAN = "korean",
-  CHINESE = "chinese",
-  GERMAN = "german",
-  FRENCH = "french",
-}
-
-@Entity("teachers")
-export class Teacher {
+@Entity("lesson_history")
+export class LessonHistory {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({ type: "uuid" })
+  lessonId: string;
 
-  @Column({ select: true })
-  password: string;
+  @Column({ type: "uuid" })
+  teacherId: string;
 
-  @Column({ nullable: true, select: false })
-  refreshToken: string;
+  @Column({ type: "uuid" })
+  studentId: string;
 
-  @Column({ nullable: true })
-  fullName: string;
+  @Column({ type: "enum", enum: [1, 2, 3, 4, 5] })
+  star: number;
 
-  @Column({ name: "phone_number", nullable: true })
-  phoneNumber: string;
+  @Column({ type: "varchar", nullable: true })
+  feedback: string;
 
-  @Column({ name: "card_number", nullable: true })
-  cardNumber: string;
+  @ManyToOne("Lesson", (lesson: any) => lesson.history)
+  @JoinColumn({ name: "lessonId" })
+  lesson: any;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @ManyToOne("Teacher", (teacher: any) => teacher.lessonHistory)
+  @JoinColumn({ name: "teacherId" })
+  teacher: any;
 
-  @Column({ default: false })
-  isDelete: boolean;
-
-  @Column({ type: "enum", enum: UserRole, default: UserRole.TEACHER })
-  role: UserRole;
-
-  @Column({ type: "enum", enum: Specification, nullable: true })
-  specification: Specification;
-
-  @Column({ nullable: true })
-  level: string;
-
-  @Column({ type: "text", nullable: true })
-  description: string;
-
-  @Column({ type: "int", default: 0 })
-  hourPrice: number;
-
-  @Column({ nullable: true })
-  portfolioLink: string;
-
-  @Column({ nullable: true })
-  imageUrl: string;
-
-  @Column({ type: "int", default: 0 })
-  rating: number;
-
-  @Column({ nullable: true })
-  expirence: string;
-
-  @OneToMany("Lesson", (lesson: any) => lesson.teacher)
-  lessons: any[];
+  @ManyToOne("Student", (student: any) => student.lessonHistory)
+  @JoinColumn({ name: "studentId" })
+  student: any;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToMany(() => LessonTemplate, (template) => template.teacher)
-  lessonTemplates: LessonTemplate[];
-
-  @OneToMany("DeletedTeacher", (deleted: any) => deleted.teacher)
-  deletedHistory: any[];
-
-  @OneToMany("Notification", (notification: any) => notification.student)
-  notifications: any[];
 }

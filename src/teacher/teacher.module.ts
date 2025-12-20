@@ -1,20 +1,13 @@
-import { Module } from "@nestjs/common";
-import { TeachersController } from "./teacher.controller";
-import { TeachersService } from "./teacher.service";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Teacher } from "./entities/teacher.entity";
-import { JwtModule } from "@nestjs/jwt";
+import { Module } from '@nestjs/common';
+import { TeacherService } from './teacher.service';
+import { TeacherController } from './teacher.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Teacher } from './entities/teacher.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Teacher]),
-    JwtModule.register({
-      secret: process.env.ACCESS_TOKEN_KEY,
-      signOptions: { expiresIn: Number(process.env.ACCESS_TOKEN_TIME) },
-    }),
-  ],
-  controllers: [TeachersController],
-  providers: [TeachersService],
-  exports: [TeachersService],
+  imports: [TypeOrmModule.forFeature([Teacher])],
+  controllers: [TeacherController],
+  providers: [TeacherService],
+  exports: [TeacherService],
 })
 export class TeacherModule {}

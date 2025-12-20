@@ -8,7 +8,6 @@ import {
   JoinColumn,
   OneToMany,
 } from "typeorm";
-import { Teacher } from "../../teacher/entities/teacher.entity";
 import { Student } from "../../student/entities/student.entity";
 
 export enum LessonStatus {
