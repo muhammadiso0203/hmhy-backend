@@ -54,7 +54,6 @@ export class AdminService {
     return admin;
   }
 
-  // Auth uchun username orqali qidirish (Parolni select qilish bilan)
   async findAdminByUsername(username: string) {
     return await this.adminRepository.findOne({
       where: { username, isDelete: false },
@@ -84,5 +83,28 @@ export class AdminService {
     return await this.adminRepository.update(id, {
       refreshToken: hashedToken ?? undefined,
     });
+  }
+
+  async getProfile(id: string) {
+    const admin = await this.adminRepository.findOne({ where: { id } });
+    if (!admin) throw new NotFoundException("Admin topilmadi");
+    return admin;
+  }
+
+  async updateProfile(id: string, updateDto: UpdateAdminDto) {
+    const admin = await this.getProfile(id);
+
+    if (updateDto.password) {
+      if (updateDto.password !== updateDto.confirmPassword) {
+        throw new BadRequestException("Parollar bir-biriga mos kelmadi");
+      }
+      const salt = await bcrypt.genSalt(10);
+      admin.password = await bcrypt.hash(updateDto.password, salt);
+    }
+
+    const { password, confirmPassword, ...otherData } = updateDto;
+    Object.assign(admin, otherData);
+
+    return await this.adminRepository.save(admin);
   }
 }

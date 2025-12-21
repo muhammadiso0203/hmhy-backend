@@ -19,6 +19,10 @@ export class UpdateAdminDto {
   @MinLength(6, { message: "Parol kamida 6 ta belgidan iborat bo'lishi kerak" })
   password?: string;
 
+  @IsOptional()
+  @IsString()
+  confirmPassword?: string;
+
   @ApiPropertyOptional({
     example: "+998901234567",
     description: "Adminning telefon raqami",

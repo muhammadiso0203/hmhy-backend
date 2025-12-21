@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from "@nestjs/common";
 import {
   ApiOperation,
@@ -23,13 +24,13 @@ import { RolesGuard } from "../common/guards/roles.guard";
 import { RolesEnum } from "src/common/enum";
 
 @ApiTags("Admin")
-@ApiBearerAuth() 
-@UseGuards(JwtAuthGuard, RolesGuard) 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("admin")
 export class AdminController {
   constructor(private readonly adminsService: AdminService) {}
 
-  @Roles(RolesEnum.SUPER_ADMIN) 
+  @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Yangi admin yaratish (Faqat SuperAdmin uchun)" })
   @ApiResponse({ status: 201, description: "Admin muvaffaqiyatli yaratildi" })
   @Post()
@@ -52,7 +53,7 @@ export class AdminController {
     return this.adminsService.findOne(id);
   }
 
-  @Roles(RolesEnum.SUPER_ADMIN) 
+  @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Admin ma'lumotlarini yangilash" })
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
@@ -64,5 +65,17 @@ export class AdminController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.adminsService.remove(id);
+  }
+
+  @Get("me") 
+  @ApiOperation({ summary: "Get current admin profile" })
+  getProfile(@Request() req) {
+    return this.adminsService.getProfile(req.user.id);
+  }
+
+  @Patch("me") 
+  @ApiOperation({ summary: "Update own profile" })
+  updateProfile(@Request() req, @Body() updateDto: UpdateAdminDto) {
+    return this.adminsService.updateProfile(req.user.id, updateDto);
   }
 }
