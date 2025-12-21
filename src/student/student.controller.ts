@@ -8,15 +8,20 @@ import {
   Delete,
   UseGuards,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiTags, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { AdminGuard } from "../common/guards/admin.guard";
 import { JwtSelfGuard } from "../common/guards/jwt-self.guard";
 import { CreateStudentDto } from "./dto/create-student.dto";
 import { UpdateStudentDto } from "./dto/update-student.dto";
 import { StudentsService } from "./student.service";
+import { RolesGuard } from "src/common/guards/roles.guard";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { RolesEnum } from "src/common/enum";
 
 @ApiTags("students")
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("students")
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
@@ -28,18 +33,21 @@ export class StudentsController {
   })
   @ApiResponse({ status: 400, description: "Yaroqsiz ma'lumotlar" })
   @Post()
+  @ApiBearerAuth()
   create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.create(createStudentDto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Barcha talabalarni olish" })
   @ApiResponse({ status: 200, description: "Talabalar ro'yxati" })
   @Get()
+  @ApiBearerAuth()
   findAll() {
     return this.studentsService.findAll();
   }
-
+  
   @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @ApiOperation({ summary: "ID bo'yicha bitta talabani olish" })
   @ApiResponse({ status: 200, description: "Talaba topildi" })

@@ -9,15 +9,23 @@ async function start() {
     const PORT = process.env.PORT || 3003;
     const app = await NestFactory.create(AppModule);
 
-    app.useGlobalPipes(new ValidationPipe())
+    app.useGlobalPipes(new ValidationPipe());
 
-    app.use(cookieParser())
+    app.use(cookieParser());
 
     const config = new DocumentBuilder()
       .setTitle("HMHY project")
       .setDescription("HMHY REST API")
       .setVersion("1.0")
       .addTag("imtixon")
+      .addBearerAuth(
+        {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+        "access-token"
+      )
       .build();
 
     const document = SwaggerModule.createDocument(app, config);

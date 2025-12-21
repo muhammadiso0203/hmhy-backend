@@ -17,11 +17,21 @@ export class StudentsService {
     return await this.studentRepository.save(newStudent);
   }
 
-  async findAll() {
-    return await this.studentRepository.find({
-      where: { isBlocked: false },
-    });
-  }
+  async findAll(page: number = 1, limit: number = 10) {
+  const [students, total] = await this.studentRepository.findAndCount({
+    where: { isBlocked: false },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+
+  return {
+    data: students,
+    total,
+    page,
+    lastPage: Math.ceil(total / limit),
+  };
+}
+
 
   async findOne(id: string) {
     const student = await this.studentRepository.findOneBy({ id });
