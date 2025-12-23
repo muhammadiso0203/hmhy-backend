@@ -6,6 +6,6 @@ export const successRes = (data: any, statusCode: number = 200) => {
       en: 'Operation successfully completed',
       ru: 'Операция успешно выполнена',
     },
-    data,
+    data
   };
 };
