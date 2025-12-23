@@ -21,3 +21,9 @@ export enum TeacherSpecification {
   KOREAN = 'KOREAN',
 }
 
+export enum LessonStatus {
+  SCHEDULED = "scheduled",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
+}
+

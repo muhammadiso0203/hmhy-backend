@@ -9,12 +9,9 @@ import {
   OneToMany,
 } from "typeorm";
 import { Student } from "../../student/entities/student.entity";
+import { LessonStatus } from "src/common/enum";
 
-export enum LessonStatus {
-  SCHEDULED = "scheduled",
-  COMPLETED = "completed",
-  CANCELLED = "cancelled",
-}
+
 
 @Entity("lesson")
 export class Lesson {
