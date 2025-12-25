@@ -35,8 +35,10 @@ export class LessonService {
       throw new BadRequestException("Iltimos, to'g'ri sanani kiriting");
     }
 
-    if (start <= now) {
-      throw new BadRequestException("Dars boshlanish vaqti hozirgi vaqtdan keyin bo'lishi kerak");
+    const minStartTime = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes from now
+
+    if (start < minStartTime) {
+      throw new BadRequestException("Dars kamida 30 daqiqa oldin yaratilishi kerak");
     }
 
     if (end <= start) {
@@ -181,6 +183,10 @@ export class LessonService {
 
   async rateLesson(id: string, dto: RateLessonDto) {
     const lesson = await this.findOne(id);
+
+    if (!lesson.studentId) {
+      throw new BadRequestException("Talaba topilmadi");
+    }
 
     const history = this.lessonHistoryRepository.create({
       lessonId: lesson.id,

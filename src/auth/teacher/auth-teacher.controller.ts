@@ -20,6 +20,10 @@ import * as passport from "passport";
 import { TimeUtils } from "../../common/utils/time.utils";
 import { RegisterStep2Dto } from "../dto/register-step2.dto";
 import { RegisterStep3Dto } from "../dto/register-step3.dto";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { CurrentUser } from "../../common/decorators/currentUser";
+import { IToken } from "../../common/token/interface";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
 @ApiTags("Teacher Auth")
 @Controller("auth/teacher")
@@ -61,6 +65,52 @@ export class AuthTeacherController {
     @Res({ passthrough: true }) res: Response
   ) {
     return this.authService.signOut(refreshToken, res);
+  }
+
+  @Get("google-calendar-status")
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  @ApiOperation({ summary: "Check Google Calendar connection status" })
+  async getGoogleCalendarStatus(@CurrentUser() user: IToken) {
+    return this.authService.checkGoogleCalendarStatus(user.id);
+  }
+
+  @Get("google/reconnect")
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  @ApiOperation({ summary: "Reconnect Google Calendar (forces new consent)" })
+  googleReconnect(@Req() req, @Res() res) {
+    passport.authenticate(
+      "google",
+      {
+        scope: [
+          "email",
+          "profile",
+          "https://www.googleapis.com/auth/calendar",
+          "https://www.googleapis.com/auth/calendar.events",
+        ],
+        accessType: "offline",
+        prompt: "consent",
+      } as passport.AuthenticateOptions,
+      (err, user, info) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ error: "Authentication failed", details: err });
+        }
+        if (!user) {
+          return res.status(401).json({ error: "No user found", info });
+        }
+        req.logIn(user, (loginErr) => {
+          if (loginErr) {
+            return res
+              .status(500)
+              .json({ error: "Login failed", details: loginErr });
+          }
+          return res.redirect("/dashboard");
+        });
+      }
+    )(req, res);
   }
 
   // Google OAuth endpoints

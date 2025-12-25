@@ -219,13 +219,22 @@ export class AuthTeacherService {
       googleUser.email
     );
 
+    const updateData: any = {};
+    if (googleUser.accessToken) updateData.googleAccessToken = googleUser.accessToken;
+    if (googleUser.refreshToken) updateData.googleRefreshToken = googleUser.refreshToken;
+
     if (!teacher) {
       teacher = await this.teachersService.create({
         email: googleUser.email,
         fullName: googleUser.fullName,
         image: googleUser.image,
         isActive: false,
+        ...updateData,
       });
+    } else {
+        if (Object.keys(updateData).length > 0) {
+            await this.teacherRepo.update(teacher.id, updateData);
+        }
     }
 
     return teacher;
@@ -287,5 +296,19 @@ export class AuthTeacherService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  async checkGoogleCalendarStatus(teacherId: string) {
+    const result = await this.teachersService.findOne(teacherId);
+    const teacher = result.data;
+
+    if (!teacher) {
+      throw new NotFoundException("O'qituvchi topilmadi");
+    }
+
+    return {
+      isConnected: !!teacher.googleRefreshToken,
+      googleEmail: teacher.email, // Assuming google login uses same email, or we could store google email separately if needed.
+    };
   }
 }
