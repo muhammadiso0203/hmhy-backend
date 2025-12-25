@@ -9,7 +9,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiTags, ApiResponse, ApiParam, ApiBody } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { AdminGuard } from "../common/guards/admin.guard";
 import { CreateLessonTemplateDto } from "./dto/create-lesson-template.dto";
@@ -58,7 +58,18 @@ export class LessonTemplateController {
   @ApiOperation({ summary: "ID bo'yicha shablonni o'chirish" })
   @ApiResponse({ status: 200, description: "Shablon o'chirildi" })
   @Delete(":id")
-  remove(@Param("id", ParseUUIDPipe) id: string) { 
+  remove(@Param("id", ParseUUIDPipe) id: string) {
     return this.lessonTemplateService.remove(id);
+  }
+
+  @Post("templates/:id/apply")
+  @ApiOperation({ summary: "Shablonni qo'llash" })
+  @ApiParam({ name: "id", type: String, description: "Template ID" })
+  @ApiResponse({ status: 200, description: "Muvaffaqiyatli qo'llandi" })
+  applyTemplate(
+    @Param("id") id: string,
+    @Body() createLessonTemplateDto: CreateLessonTemplateDto
+  ) {
+    return this.lessonTemplateService.applyTemplate(id, createLessonTemplateDto);
   }
 }

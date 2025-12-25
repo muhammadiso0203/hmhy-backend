@@ -12,11 +12,11 @@ import {
 import { PaymeParamsDto } from "./dto/payme-request.dto";
 import { LessonService } from "../lesson/lesson.service";
 import { NotificationService } from "../notification/notification.service";
-import { Lesson, LessonStatus } from "../lesson/entities/lesson.entity";
+import { Lesson } from "../lesson/entities/lesson.entity";
 import { Student } from "../student/entities/student.entity";
 import { Teacher } from "../teacher/entities/teacher.entity";
 import { PaymeTransactionError } from "../common/errors/payment.error";
-import { PaymeError } from "../common/enum";
+import { LessonStatus, PaymeError } from "../common/enum";
 import { Transaction } from "../transaction/entities/transaction.entity";
 
 // Payme tranzaksiya holatlari

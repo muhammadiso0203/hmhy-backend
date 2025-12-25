@@ -7,6 +7,8 @@ import {
   IsInt,
   IsOptional,
   IsBoolean,
+  MaxDate,
+  MinDate,
 } from "class-validator";
 
 export class CreateLessonDto {

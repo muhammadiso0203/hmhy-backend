@@ -8,12 +8,8 @@ import {
   IsUUID,
   IsInt,
 } from "class-validator";
+import { LessonStatus } from "src/common/enum";
 
-export enum LessonStatus {
-  SCHEDULED = "scheduled",
-  COMPLETED = "completed",
-  CANCELLED = "cancelled",
-}
 
 export class UpdateLessonDto {
   @ApiPropertyOptional({ example: "Matematika darsi" })

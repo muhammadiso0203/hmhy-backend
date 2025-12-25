@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { LessonTemplate } from "./entities/lessonTemplate.entity";
 import { CreateLessonTemplateDto } from "./dto/create-lesson-template.dto";
 import { UpdateLessonTemplateDto } from "./dto/update-lesson-template.dto";
+import { successRes } from "src/common/response/succesResponse";
 
 @Injectable()
 export class LessonTemplateService {
@@ -38,6 +39,19 @@ export class LessonTemplateService {
       throw new NotFoundException(`Dars shabloni ID=${id} topilmadi`);
     }
     return template;
+  }
+
+  async applyTemplate(id: string, createLessonDto: CreateLessonTemplateDto) {
+    const template = await this.lessonTemplateRepository.findOneBy({ id });
+    if (!template) {
+      throw new NotFoundException("Template not found");
+    }
+    const lesson = await this.lessonTemplateRepository.create({
+      ...createLessonDto,
+      teacher: { id },
+    });
+
+    return successRes(lesson, 200);
   }
 
   async findByTeacher(teacherId: string) {

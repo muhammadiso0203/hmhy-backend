@@ -22,36 +22,38 @@ export enum TeacherSpecification {
 }
 
 export enum PaymeMethod {
-  CheckPerformTransaction = "CheckPerformTransaction", // To'lovni amalga oshirish mumkinligini tekshirish
-  CreateTransaction = "CreateTransaction", // Tranzaksiya yaratish
-  PerformTransaction = "PerformTransaction", // To'lovni o'tkazish (yopish)
-  CancelTransaction = "CancelTransaction", // Tranzaksiyani bekor qilish
-  CheckTransaction = "CheckTransaction", // Tranzaksiya holatini tekshirish
-  GetStatement = "GetStatement", // Ma'lum bir davr uchun hisobotlarni olish
+  CheckPerformTransaction = "CheckPerformTransaction",
+  CreateTransaction = "CreateTransaction",
+  PerformTransaction = "PerformTransaction",
+  CancelTransaction = "CancelTransaction",
+  CheckTransaction = "CheckTransaction",
+  GetStatement = "GetStatement",
 }
 
 export enum PaymeError {
-  // Tizimli xatoliklar (JSON-RPC standart)
-  TransportError = -32300, // Transport xatoligi
-  AccessDeny = -32504, // Kirishga ruxsat yo'q (Secret key noto'g'ri)
-  ParseError = -32700, // JSONni o'qishda xatolik
-  MethodNotFound = -32601, // So'ralgan metod topilmadi
-  InvalidParams = -32602, // Kirish parametrlarida xatolik
-  InternalError = -32400, // Server ichki xatosi
+  TransportError = -32300,
+  AccessDeny = -32504,
+  ParseError = -32700,
+  MethodNotFound = -32601,
+  InvalidParams = -32602,
+  InternalError = -32400,
+  CantDoOperation = -31008,
+  TransactionNotFound = -31003,
+  AlreadyDone = -31006,
+  Pending = -31050,
+  InvalidAmount = -31003,
+  CantCancelTransaction = -31007,
+  UserNotFound = -31050,
+  StudentNotFound = -31050,
+  OrderNotFound = -31051,
+  LessonNotFound = -31001,
+  LessonNotAvailable = -31051,
+  StudentBlocked = -31052,
+}
 
-  // Tranzaksiyaga oid xatoliklar
-  CantDoOperation = -31008, // Operatsiyani bajarib bo'lmaydi
-  TransactionNotFound = -31003, // Tranzaksiya topilmadi
-  AlreadyDone = -31006, // Tranzaksiya allaqachon bajarilgan
-  Pending = -31050, // Tranzaksiya kutilmoqda (foydalanuvchi band)
-  InvalidAmount = -31003, // To'lov summasi noto'g'ri
-  CantCancelTransaction = -31007, // Tranzaksiyani bekor qilib bo'lmaydi
-
-  // Biznes mantiq xatoliklari (Sizning tizimingizga oid)
-  UserNotFound = -31050, // Foydalanuvchi topilmadi
-  StudentNotFound = -31050, // Student topilmadi
-  OrderNotFound = -31051, // Buyurtma topilmadi
-  LessonNotFound = -31001, // Dars topilmadi
-  LessonNotAvailable = -31051, // Dars mavjud emas (band yoki bekor qilingan)
-  StudentBlocked = -31052, // Student bloklangan
+export enum LessonStatus {
+  AVAILABLE = "available",
+  BOOKED = "booked",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
 }
