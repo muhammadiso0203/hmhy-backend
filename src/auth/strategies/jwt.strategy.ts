@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
         return token;
       },
       ignoreExpiration: false,
-      secretOrKey: process.env.ACCESS_TOKEN_KEY,
+      secretOrKey: process.env.ACCESS_TOKEN_KEY!,
     });
     console.log(
       "2. .env dan olingan Secret Key:",

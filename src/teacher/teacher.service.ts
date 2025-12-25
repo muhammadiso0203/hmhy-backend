@@ -16,7 +16,7 @@ export class TeacherService {
   constructor(
     @InjectRepository(Teacher)
     private readonly teacherRepo: Repository<Teacher>
-  ) {}
+  ) { }
 
   async create(data: Partial<Teacher>): Promise<Teacher> {
     const newTeacher = this.teacherRepo.create(data);
@@ -131,12 +131,19 @@ export class TeacherService {
   }
 
   async hardDeleteTeacher(id: string) {
-    const teacher = await this.teacherRepo.findOne({ where: { id } });
-    if (!teacher) {
-      throw new NotFoundException("Teacher not found");
+    try {
+
+      const teacher = await this.teacherRepo.findOne({ where: { id } });
+      if (!teacher) {
+        throw new NotFoundException("Teacher not found");
+      }
+      await this.teacherRepo.remove(teacher);
+      return successRes({ message: "Teacher permanently deleted" });
+    } catch (error) {
+      throw error;
     }
-    await this.teacherRepo.remove(teacher);
-    return successRes({ message: "Teacher permanently deleted" });
+
+
   }
 
   async findTeacherByEmail(email: string) {

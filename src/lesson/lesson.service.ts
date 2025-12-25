@@ -184,6 +184,10 @@ export class LessonService {
   async rateLesson(id: string, dto: RateLessonDto) {
     const lesson = await this.findOne(id);
 
+    if (!lesson.studentId) {
+      throw new BadRequestException("Talaba topilmadi");
+    }
+
     const history = this.lessonHistoryRepository.create({
       lessonId: lesson.id,
       teacherId: lesson.teacherId,
