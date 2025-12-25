@@ -11,7 +11,6 @@ import {
 import { Student } from "../../student/entities/student.entity";
 import { LessonStatus } from "src/common/enum";
 
-
 @Entity("lesson")
 export class Lesson {
   @PrimaryGeneratedColumn("uuid")

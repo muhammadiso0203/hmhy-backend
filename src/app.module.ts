@@ -14,6 +14,8 @@ import { LessonHistoryModule } from "./lessonHistory/lessonHistory.module";
 import { TransactionModule } from "./transaction/transaction.module";
 import { TeacherPaymentModule } from "./teacherPayment/teacherPayment.module";
 import { PaymentModule } from "./payment/payment.module";
+import { TelegrafModule } from "nestjs-telegraf";
+import { BotModule } from "./bot/bot.module";
 
 @Module({
   imports: [
@@ -46,6 +48,7 @@ import { PaymentModule } from "./payment/payment.module";
     TransactionModule,
     TeacherPaymentModule,
     PaymentModule,
+    BotModule,
   ],
   controllers: [],
   providers: [],

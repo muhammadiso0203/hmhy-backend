@@ -38,7 +38,7 @@ export class CreateLessonHistoryDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  studentId: string;
+  studentId: string | undefined;
 
   @ApiProperty({
     example: 5,

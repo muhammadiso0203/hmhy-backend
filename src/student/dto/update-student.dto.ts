@@ -23,7 +23,7 @@ export class UpdateStudentDto {
   @IsPhoneNumber()
   phoneNumber?: string;
 
-  @ApiPropertyOptional({ example: "STUDENT" })
+  @ApiPropertyOptional({ example: "student" })
   @IsOptional()
   @IsString()
   role?: string;

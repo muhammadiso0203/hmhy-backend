@@ -14,6 +14,10 @@ import { MailerService } from "@nestjs-modules/mailer";
 import { MailModule } from "../mail/mail.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { AuthStudentService } from "./student/auth-student.service";
+import { AuthStudentController } from "./student/auth-student.controller";
+import { StudentModule } from "../student/student.module";
+import { Student } from "../student/entities/student.entity";
 
 @Module({
   imports: [
@@ -21,11 +25,27 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     JwtModule.register({}),
     TeacherModule,
     AdminModule,
-    TypeOrmModule.forFeature([Teacher]),
+    TypeOrmModule.forFeature([Teacher, Student]),
     MailModule,
+    StudentModule,
   ],
-  controllers: [AuthTeacherController, AuthAdminController],
-  providers: [AuthTeacherService, AuthAdminService, GoogleStrategy, JwtStrategy],
-  exports: [AuthTeacherService, JwtStrategy, PassportModule],
+  controllers: [
+    AuthTeacherController,
+    AuthAdminController,
+    AuthStudentController,
+  ],
+  providers: [
+    AuthTeacherService,
+    AuthAdminService,
+    GoogleStrategy,
+    JwtStrategy,
+    AuthStudentService,
+  ],
+  exports: [
+    AuthTeacherService,
+    JwtStrategy,
+    PassportModule,
+    AuthStudentService,
+  ],
 })
 export class AuthModule {}

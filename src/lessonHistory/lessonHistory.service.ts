@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { CreateLessonHistoryDto } from "./dto/create-lesson-history.dto";
 import { UpdateLessonHistoryDto } from "./dto/update-lesson-history.dto";
 import { LessonHistory } from "./entities/lessonHistory.entity";
@@ -13,10 +13,10 @@ export class LessonHistoryService {
   ) {}
 
   async create(createDto: CreateLessonHistoryDto) {
-    const newHistory = this.lessonHistoryRepository.create(createDto);
-    return await this.lessonHistoryRepository.save(newHistory);
-  }
+    const history = this.lessonHistoryRepository.create(createDto as any);
 
+    return await this.lessonHistoryRepository.save(history);
+  }
   async findAll() {
     return await this.lessonHistoryRepository.find({
       relations: ["lesson", "teacher", "student"],

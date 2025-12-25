@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  NotFoundException,
+  Request,
 } from "@nestjs/common";
 import {
   ApiOperation,
   ApiTags,
   ApiResponse,
   ApiBearerAuth,
+  ApiParam,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { AdminGuard } from "../common/guards/admin.guard";
@@ -24,9 +27,11 @@ import { RolesGuard } from "src/common/guards/roles.guard";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { RolesEnum } from "src/common/enum";
 import { BlockStudentDto } from "./dto/blockStudent.dto";
+import { IToken } from "../common/token/interface";
+import { CurrentUser } from "../common/decorators/currentUser";
 
 @ApiTags("students")
-@ApiBearerAuth()
+@ApiBearerAuth("access-token")
 // @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("students")
 export class StudentsController {
@@ -39,7 +44,6 @@ export class StudentsController {
   })
   @ApiResponse({ status: 400, description: "Yaroqsiz ma'lumotlar" })
   @Post()
-  @ApiBearerAuth()
   create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.create(createStudentDto);
   }
@@ -63,6 +67,25 @@ export class StudentsController {
     return this.studentsService.stats();
   }
 
+  @Get("me")
+  @ApiOperation({ summary: "Get current student profile" })
+  @ApiBearerAuth("access-token")
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 200,
+    description: "Get student profile successfully",
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async getProfile(@CurrentUser() user: IToken) {
+    const profile = await this.studentsService.getStudentProfileById(user.id);
+
+    if (!profile) {
+      throw new NotFoundException("Student profile not found");
+    }
+
+    return profile;
+  }
+
   // @UseGuards(JwtAuthGuard, JwtSelfGuard)
   // @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Student block" })
@@ -80,11 +103,9 @@ export class StudentsController {
   @ApiOperation({ summary: "Student unblock" })
   @ApiResponse({ status: 200, description: "Student unblocked" })
   @Post("unblock/:id")
-  unblockStudent(
-    @Param("id") id: string ) {
+  unblockStudent(@Param("id") id: string) {
     return this.studentsService.unblockStudent(id);
   }
-
 
   // @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @ApiOperation({ summary: "ID bo'yicha bitta talabani olish" })
@@ -109,5 +130,25 @@ export class StudentsController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.studentsService.remove(id);
+  }
+
+  @Get(":chatId/lessons")
+  async getStudentLessons(@Param("chatId") chatId: string) {
+    const lessons = await this.studentsService.getLessonsByChatId(chatId);
+
+    if (!lessons || lessons.length === 0) {
+      throw new NotFoundException(`Bu talaba uchun darslar topilmadi.`);
+    }
+
+    return lessons;
+  }
+
+  @Get(":chatId/history")
+  @ApiOperation({ summary: "Talabaning darslar tarixini olish" })
+  @ApiResponse({ status: 200, description: "Tugatilgan darslar ro‘yxati" })
+  async getHistory(@Param("chatId") chatId: string) {
+    const history = await this.studentsService.getLessonHistory(chatId);
+    if (!history) throw new NotFoundException("Tarix topilmadi");
+    return history;
   }
 }

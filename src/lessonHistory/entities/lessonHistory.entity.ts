@@ -20,7 +20,7 @@ export class LessonHistory {
   teacherId: string;
 
   @Column({ type: "uuid" })
-  studentId: string;
+  studentId: string | null;
 
   @Column({ type: "enum", enum: [1, 2, 3, 4, 5] })
   star: number;

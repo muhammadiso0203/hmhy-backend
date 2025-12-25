@@ -11,36 +11,44 @@ import { Observable } from "rxjs";
 export class JwtAuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
-  canActivate(
-    context: ExecutionContext
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+    const authHeader = req.headers.authorization;
 
     let token: string | undefined;
-    const authHeader = req.headers.authorization;
-    console.log(authHeader);
-    
 
-    if (authHeader && authHeader.split(" ")[0] === "Bearer") {
+    if (authHeader && authHeader.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
-    } else if (req.cookies && req.cookies.adminToken) {
-      token = req.cookies.adminToken;
+    }
+    else if (req.cookies) {
+      token =
+        req.cookies.adminToken ||
+        req.cookies.refresh_token ||
+        req.cookies.teacherToken;
     }
 
     if (!token) {
-      throw new UnauthorizedException({
-        message: "Foydalanuvchi authorizatsiya dan otmagan",
-      });
+      throw new UnauthorizedException({ message: "Token topilmadi" });
     }
 
     try {
-      const user = this.jwtService.verify(token, {
-        secret: process.env.ACCESS_TOKEN_KEY,
+      const token =
+        req.headers.authorization?.split(" ")[1] || req.cookies?.refresh_token;
+
+      if (!token)
+        throw new UnauthorizedException({ message: "Token topilmadi" });
+
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.REFRESH_TOKEN_KEY, 
       });
-      req.user = user;
+
+      req.user = payload;
       return true;
     } catch (error) {
-      throw new UnauthorizedException({ message: "Token notog'ri" });
+      console.log("Verify Error:", error.message);
+      throw new UnauthorizedException({
+        message: "Token yaroqsiz yoki muddati o'tgan",
+      });
     }
   }
 }

@@ -28,10 +28,10 @@ export class Student {
   phoneNumber: string;
 
   @Column({ unique: true, nullable: true })
-  email: string; 
+  email: string;
 
   @Column({ type: "varchar", nullable: true })
-  telegramId: string | null; 
+  telegramId: string | null;
 
   @Column({
     type: "enum",
@@ -52,8 +52,17 @@ export class Student {
   @Column({ type: "timestamp", nullable: true })
   blockedAt: Date;
 
+  @Column({ nullable: true, select: false }) 
+  refreshToken: string;
+
   @Column({ nullable: true })
   blockedReason: string;
+
+  @Column({ default: "START" })
+  step: string;
+
+  @Column({ unique: true, nullable: true })
+  chatId: string;
 
   @OneToMany(() => Lesson, (lesson) => lesson.student)
   lesson: Lesson[];
