@@ -22,16 +22,15 @@ export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {
   reason?: string;
 
   @ApiPropertyOptional({
-    example: "2025-12-20T15:00:00Z",
+    description: "Yangilangan to‘lov vaqti",
+    example: "2025-12-25T10:30:00Z",
   })
   @IsOptional()
   @IsDateString()
-  performaceTime?: Date;
+  performanceTime?: string;
 
-  @ApiPropertyOptional({
-    example: "2025-12-20T15:05:00Z",
-  })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
-  canceledTime?: Date;
+  canceledTime?: string;
 }

@@ -27,6 +27,12 @@ export class Student {
   @Column({ unique: true, nullable: true })
   phoneNumber: string;
 
+  @Column({ unique: true, nullable: true })
+  email: string; 
+
+  @Column({ type: "varchar", nullable: true })
+  telegramId: string | null; 
+
   @Column({
     type: "enum",
     enum: StudentRole,

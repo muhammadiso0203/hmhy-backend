@@ -48,8 +48,6 @@ export class CreateLessonDto {
     example: "uuid-talaba-id",
     description: "Darsda qatnashuvchi talabaning IDsi",
   })
-  @IsUUID()
-  @IsNotEmpty()
   studentId: string;
 
   @ApiProperty({

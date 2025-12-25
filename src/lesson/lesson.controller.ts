@@ -9,7 +9,7 @@ import {
   UseGuards,
   Query,
 } from "@nestjs/common";
-import { ApiOperation, ApiTags, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { Roles } from "../common/decorators/roles.decorator";
@@ -25,11 +25,12 @@ import { IToken } from "../common/token/interface";
 
 @ApiTags("lessons")
 @Controller("lessons")
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth("access-token")
 export class LessonController {
   constructor(private readonly lessonsService: LessonService) {}
 
-  @Roles("admin", "teacher")
+  @Roles("ADMIN", "TEACHER")
   @ApiOperation({ summary: "Yangi dars yaratish" })
   @Post()
   create(@Body() createLessonDto: CreateLessonDto) {

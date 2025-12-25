@@ -12,7 +12,6 @@ import { Student } from "../../student/entities/student.entity";
 import { LessonStatus } from "src/common/enum";
 
 
-
 @Entity("lesson")
 export class Lesson {
   @PrimaryGeneratedColumn("uuid")
@@ -45,11 +44,14 @@ export class Lesson {
   @Column({ type: "uuid" })
   teacherId: string;
 
-  @Column({ type: "uuid" })
-  studentId: string;
+  @Column({ type: "uuid", nullable: true })
+  studentId: string | null;
 
   @Column({ type: "uuid", nullable: true })
   teacherPayment: string;
+
+  @Column({ type: "varchar", nullable: true })
+  meetingUrl: string | null;
 
   @Column({ type: "timestamp", nullable: true })
   bookedAt: Date;

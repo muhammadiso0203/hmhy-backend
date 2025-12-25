@@ -1,8 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
   IsNotEmpty,
   IsUUID,
   IsNumber,
+  IsPositive,
   IsEnum,
   IsOptional,
   IsString,
@@ -17,59 +18,60 @@ export enum TransactionStatus {
 
 export class CreateTransactionDto {
   @ApiProperty({
-    example: "uuid-lesson-id",
-    description: "Tranzaksiya bog'langan dars ID-si",
+    description: "Dars ID (UUID)",
+    example: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
   })
-  @IsUUID()
+  @IsUUID("4")
   @IsNotEmpty()
-  lesson: string;
+  lessonId: string;
 
   @ApiProperty({
-    example: "uuid-student-id",
-    description: "To'lovni amalga oshiruvchi talaba ID-si",
+    description: "Talaba ID (UUID)",
+    example: "a1b2c3d4-e5f6-7890-g1h2-i3j4k5l6m7n8",
   })
-  @IsUUID()
+  @IsUUID("4")
   @IsNotEmpty()
-  student: string;
+  studentId: string;
 
   @ApiProperty({
-    example: 50000.0,
-    description: "To'lov summasi",
+    description: "To'lov summasi (so'mda)",
+    example: 150000,
   })
   @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   price: number;
 
   @ApiProperty({
-    example: TransactionStatus.PENDING,
-    enum: TransactionStatus,
     description: "Tranzaksiya holati",
+    enum: TransactionStatus,
+    default: TransactionStatus.PENDING,
   })
   @IsEnum(TransactionStatus)
-  @IsNotEmpty()
-  status: TransactionStatus;
+  @IsOptional()
+  status?: TransactionStatus = TransactionStatus.PENDING;
 
-  @ApiProperty({
-    example: "To'lov tizimidagi xatolik",
+  @ApiPropertyOptional({
     description: "Bekor qilish sababi",
+    example: "Foydalanuvchi rad etdi",
   })
   @IsString()
   @IsOptional()
   reason?: string;
 
-  @ApiProperty({
-    example: "2025-12-20T10:00:00Z",
-    description: "Amalga oshirilgan vaqt",
+  @ApiPropertyOptional({
+    description: "To'lov amalga oshirilgan vaqt",
+    example: "2025-12-25T10:30:00Z",
   })
   @IsDateString()
   @IsOptional()
-  performaceTime?: Date;
+  performanceTime?: string; // ← "performace" emas, "performance" + string
 
-  @ApiProperty({
-    example: "2025-12-20T10:05:00Z",
+  @ApiPropertyOptional({
     description: "Bekor qilingan vaqt",
+    example: "2025-12-25T11:00:00Z",
   })
   @IsDateString()
   @IsOptional()
-  canceledTime?: Date;
+  canceledTime?: string; // string
 }

@@ -6,23 +6,26 @@ import { TeacherModule } from "../teacher/teacher.module";
 import { AuthAdminController } from "./admin/auth-admin.controller";
 import { AuthAdminService } from "./admin/auth-admin.service";
 import { AdminModule } from "../admin/admin.module";
-import { GoogleStrategy } from "./google.strategy";
+import { GoogleStrategy } from "./strategies/google.strategy";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Teacher } from "../teacher/entities/teacher.entity";
 import { MailService } from "../mail/mail.service";
 import { MailerService } from "@nestjs-modules/mailer";
 import { MailModule } from "../mail/mail.module";
+import { PassportModule } from "@nestjs/passport";
+import { JwtStrategy } from "./strategies/jwt.strategy";
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.register({}),
     TeacherModule,
     AdminModule,
     TypeOrmModule.forFeature([Teacher]),
-    MailModule
+    MailModule,
   ],
   controllers: [AuthTeacherController, AuthAdminController],
-  providers: [AuthTeacherService, AuthAdminService, GoogleStrategy],
-  exports: [AuthTeacherService],
+  providers: [AuthTeacherService, AuthAdminService, GoogleStrategy, JwtStrategy],
+  exports: [AuthTeacherService, JwtStrategy, PassportModule],
 })
 export class AuthModule {}
