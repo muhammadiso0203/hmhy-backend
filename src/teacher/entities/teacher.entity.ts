@@ -97,4 +97,10 @@ export class Teacher {
 
   @Column({ type: "timestamp", nullable: true, select: false })
   otpExpires: Date;
+
+  @Column({ type: "text", nullable: true })
+  googleAccessToken: string | null;
+
+  @Column({ type: "text", nullable: true })
+  googleRefreshToken: string | null;
 }

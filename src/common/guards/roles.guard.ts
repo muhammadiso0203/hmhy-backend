@@ -10,7 +10,8 @@ import { RolesEnum } from "../enum";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
+  
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<RolesEnum[]>(
@@ -23,6 +24,8 @@ export class RolesGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest();
+    console.log("User role:", user.role);
+
 
     if (!user || !user.role) {
       throw new ForbiddenException(

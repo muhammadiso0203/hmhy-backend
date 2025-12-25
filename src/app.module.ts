@@ -13,6 +13,7 @@ import { NotificationModule } from "./notification/notification.module";
 import { LessonHistoryModule } from "./lessonHistory/lessonHistory.module";
 import { TransactionModule } from "./transaction/transaction.module";
 import { TeacherPaymentModule } from "./teacherPayment/teacherPayment.module";
+import { PaymentModule } from "./payment/payment.module";
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { TeacherPaymentModule } from "./teacherPayment/teacherPayment.module";
     LessonHistoryModule,
     TransactionModule,
     TeacherPaymentModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],

@@ -5,6 +5,7 @@ import {
   IsPhoneNumber,
   IsOptional,
   IsUUID,
+  IsEmail,
 } from "class-validator";
 
 export class CreateStudentDto {

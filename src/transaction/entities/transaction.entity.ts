@@ -1,23 +1,23 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-
-export enum TransactionStatus {
-  PENDING = "pending",
-  COMPLETED = "completed",
-  CANCELED = "canceled",
-}
+import { Lesson } from "../../lesson/entities/lesson.entity";
+import { Student } from "../../student/entities/student.entity";
 
 @Entity("transaction")
 export class Transaction {
   @PrimaryGeneratedColumn("uuid")
   id: string;
+
+  // Payme tranzaksiya ID si (Payme tomonidan beriladi)
+  @Column({ type: "varchar", unique: true, nullable: true })
+  paymeId: string;
 
   @Column({ type: "uuid" })
   lessonId: string;
@@ -26,35 +26,46 @@ export class Transaction {
   studentId: string;
 
   @Column({ type: "decimal", precision: 10, scale: 2 })
-  price: number;
+  amount: number; // price o‘rniga amount ishlatish yaxshiroq
 
-  @Column({
-    type: "enum",
-    enum: TransactionStatus,
-    default: TransactionStatus.PENDING,
-  })
-  status: TransactionStatus;
+  @Column({ type: "bigint" }) // Payme vaqtini millisekundda saqlash uchun
+  createTime: bigint;
 
-  @Column({ type: "timestamp", nullable: true })
-  canceledTime: Date;
+  @Column({ type: "bigint", nullable: true })
+  performTime: bigint | null;
 
-  @Column({ type: "timestamp", nullable: true })
-  performaceTime: Date;
+  @Column({ type: "bigint", nullable: true })
+  cancelTime: bigint | null;
 
   @Column({ type: "varchar", nullable: true })
-  reason: string;
+  reason: string | null;
 
-  @ManyToOne("Lesson", (lesson: any) => lesson.transactions)
+  @Column({ type: "varchar" })
+  provider: string; // PAYME yoki CLICK
+
+  @Column({
+    type: "varchar",
+    default: "PENDING",
+  })
+  state: string; // "PENDING", "PAID", "PENDING_CANCELED", "PAID_CANCELED"
+
+  // Relations
+  @ManyToOne(() => Lesson, (lesson) => lesson.transactions)
   @JoinColumn({ name: "lessonId" })
-  lesson: any;
+  lesson: Lesson;
 
-  @ManyToOne("Student", (student: any) => student.transactions)
+  @ManyToOne(() => Student, (student) => student.transactions)
   @JoinColumn({ name: "studentId" })
-  student: any;
+  student: Student;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ type: "varchar", nullable: true })
+  clickId: string | null;
+
+  
 }

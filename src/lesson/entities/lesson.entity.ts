@@ -11,7 +11,7 @@ import {
 import { Student } from "../../student/entities/student.entity";
 
 export enum LessonStatus {
-  SCHEDULED = "scheduled",
+  AVAILABLE = "available",
   COMPLETED = "completed",
   CANCELLED = "cancelled",
 }
@@ -33,7 +33,7 @@ export class Lesson {
   @Column({ nullable: true })
   googleMeetsUrl: string;
 
-  @Column({ type: "enum", enum: LessonStatus, default: LessonStatus.SCHEDULED })
+  @Column({ type: "enum", enum: LessonStatus, default: LessonStatus.AVAILABLE })
   status: LessonStatus;
 
   @Column({ nullable: true })
@@ -48,11 +48,14 @@ export class Lesson {
   @Column({ type: "uuid" })
   teacherId: string;
 
-  @Column({ type: "uuid" })
-  studentId: string;
+  @Column({ type: "uuid", nullable: true })
+  studentId: string | null;
 
   @Column({ type: "uuid", nullable: true })
   teacherPayment: string;
+
+  @Column({ type: "varchar", nullable: true })
+  meetingUrl: string | null;
 
   @Column({ type: "timestamp", nullable: true })
   bookedAt: Date;
