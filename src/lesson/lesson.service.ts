@@ -210,4 +210,25 @@ export class LessonService {
     await this.lessonRepository.remove(lesson);
     return { message: "Dars muvaffaqiyatli o'chirildi" };
   }
+
+  async getLessonStats() {
+    // Get booked lessons count
+    const bookedLessons = await this.lessonRepository.count({
+      where: { bookedAt: Not(IsNull()) },
+    });
+
+    // Get total lessons count
+    const totalLessons = await this.lessonRepository.count();
+
+    // Calculate total pages (assuming 10 items per page)
+    const itemsPerPage = 20;
+    const totalPages = Math.ceil(totalLessons / itemsPerPage);
+
+    return {
+      bookedLessons,
+      totalLessons,
+      totalPages,
+      itemsPerPage,
+    };
+  }
 }

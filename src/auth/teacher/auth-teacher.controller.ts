@@ -118,7 +118,7 @@ export class AuthTeacherController {
               .status(500)
               .json({ error: "Login failed", details: loginErr });
           }
-          return res.redirect("/teacher/dashboard");
+          return res.redirect("/teacher/my-lessons");
         });
       }
     )(req, res);
@@ -199,7 +199,7 @@ export class AuthTeacherController {
         path: "/",
       });
 
-      return res.redirect(`http://localhost:5173/teacher/dashboard`);
+      return res.redirect(`http://localhost:5173/teacher/my-lessons`);
     }
 
     if (step === "inactive") {

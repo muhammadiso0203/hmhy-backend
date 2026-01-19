@@ -97,6 +97,14 @@ export class LessonController {
     return result;
   }
 
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  @ApiOperation({ summary: "Get lesson statistics" })
+  @Get("stats/all")
+  async getStats() {
+    const result = await this.lessonsService.getLessonStats();
+    return successRes(result);
+  }
+
   // @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, RolesEnum.STUDENT, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "ID bo'yicha dars ma'lumotlarini olish" })
   @Get(":id")

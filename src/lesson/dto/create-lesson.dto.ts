@@ -42,6 +42,7 @@ export class CreateLessonDto {
   })
   @IsUUID()
   @IsNotEmpty()
+  @IsOptional()
   teacherId: string;
 
   @ApiProperty({

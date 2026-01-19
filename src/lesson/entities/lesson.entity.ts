@@ -41,7 +41,7 @@ export class Lesson {
   isPaid: boolean;
 
   @Column({ type: "uuid" })
-  teacherId: string;
+  teacherId?: string;
 
   @Column({ type: "uuid", nullable: true })
   studentId: string | null;
