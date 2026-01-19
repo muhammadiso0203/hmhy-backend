@@ -10,11 +10,13 @@ export class TeacherPaymentService {
   constructor(
     @InjectRepository(TeacherPayment)
     private readonly teacherPaymentRepository: Repository<TeacherPayment>
-  ) {}
+  ) { }
 
   async create(createDto: CreateTeacherPaymentDto) {
+    const { teacher, ...rest } = createDto;
     const newPayment = this.teacherPaymentRepository.create({
-      ...createDto,
+      ...rest,
+      teacherId: teacher, // DTO'dagi 'teacher' ni entity'dagi 'teacherId' ga mapping qilish
       paidAt: new Date(), // To'lov amalga oshirilgan vaqt
     });
     return await this.teacherPaymentRepository.save(newPayment);
@@ -53,5 +55,52 @@ export class TeacherPaymentService {
     const payment = await this.findOne(id);
     await this.teacherPaymentRepository.remove(payment);
     return { message: "To'lov tarixi o'chirildi" };
+  }
+
+  async getStatistics() {
+    const allPayments = await this.teacherPaymentRepository.find();
+
+    // Jami to'langan (paidAt mavjud va bekor qilinmagan)
+    const paidPayments = allPayments.filter(
+      (p) => p.paidAt !== null && !p.isCanceled
+    );
+    const totalPaidCount = paidPayments.length;
+    const totalPaidAmount = paidPayments.reduce(
+      (sum, p) => sum + p.totalLessonAmount,
+      0
+    );
+
+    // Jami to'lanmagan (paidAt null va bekor qilinmagan)
+    const unpaidPayments = allPayments.filter(
+      (p) => p.paidAt === null && !p.isCanceled
+    );
+    const totalUnpaidCount = unpaidPayments.length;
+    const totalUnpaidAmount = unpaidPayments.reduce(
+      (sum, p) => sum + p.totalLessonAmount,
+      0
+    );
+
+    // Bekor qilingan
+    const canceledPayments = allPayments.filter((p) => p.isCanceled);
+    const totalCanceledCount = canceledPayments.length;
+    const totalCanceledAmount = canceledPayments.reduce(
+      (sum, p) => sum + p.totalLessonAmount,
+      0
+    );
+
+    return {
+      totalPaid: {
+        count: totalPaidCount,
+        amount: totalPaidAmount,
+      },
+      totalUnpaid: {
+        count: totalUnpaidCount,
+        amount: totalUnpaidAmount,
+      },
+      canceled: {
+        count: totalCanceledCount,
+        amount: totalCanceledAmount,
+      },
+    };
   }
 }

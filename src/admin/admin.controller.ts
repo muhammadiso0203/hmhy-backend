@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  ParseUUIDPipe,
 } from "@nestjs/common";
 import {
   ApiOperation,
@@ -29,22 +30,22 @@ import { successRes } from "../common/response/succesResponse";
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("admin")
 export class AdminController {
-  constructor(private readonly adminsService: AdminService) {}
+  constructor(private readonly adminsService: AdminService) { }
 
   @Get("me")
   @ApiOperation({ summary: "Get current admin profile" })
   @ApiResponse({ status: 200, description: "Profil muvaffaqiyatli olindi" })
-  getProfile(@Request() req) {
-    const profile = this.adminsService.getProfile(req.user.id);
-    return successRes(profile);
+  async getProfile(@Request() req) {
+    const profile = await this.adminsService.getProfile(req.user.id);
+    return profile;
   }
 
   @Patch("me")
   @ApiOperation({ summary: "Update own profile" })
   @ApiResponse({ status: 200, description: "Profil muvaffaqiyatli yangilandi" })
-  updateProfile(@Request() req, @Body() updateDto: UpdateAdminDto) {
-    const updated = this.adminsService.updateProfile(req.user.id, updateDto);
-    return successRes(updated);
+  async updateProfile(@Request() req, @Body() updateDto: UpdateAdminDto) {
+    const updated = await this.adminsService.updateProfile(req.user.id, updateDto);
+    return updated;
   }
 
   @Roles(RolesEnum.SUPER_ADMIN)
@@ -56,7 +57,19 @@ export class AdminController {
   })
   create(@Body() createAdminDto: CreateAdminDto) {
     const newAdmin = this.adminsService.create(createAdminDto);
-    return successRes(newAdmin, 201);
+    return newAdmin;
+  }
+
+  @Roles(RolesEnum.SUPER_ADMIN, RolesEnum.ADMIN)
+  @Get(["statistics"])
+  @ApiOperation({ summary: "Get system statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Statistika muvaffaqiyatli olindi",
+  })
+  getStatistics() {
+    const statistic = this.adminsService.getStatistics().then((data) => data);
+    return statistic;
   }
 
   @Roles(RolesEnum.SUPER_ADMIN, RolesEnum.ADMIN)
@@ -68,33 +81,33 @@ export class AdminController {
   })
   findAll() {
     const admins = this.adminsService.findAll();
-    return successRes(admins);
+    return admins;
   }
 
   @Roles(RolesEnum.SUPER_ADMIN, RolesEnum.ADMIN)
   @Get(":id")
   @ApiOperation({ summary: "Get admin by ID" })
   @ApiResponse({ status: 200, description: "Admin muvaffaqiyatli topildi" })
-  findOne(@Param("id") id: string) {
+  findOne(@Param("id", new ParseUUIDPipe()) id: string) {
     const admin = this.adminsService.findOne(id);
-    return successRes(admin);
+    return admin;
   }
 
   @Roles(RolesEnum.SUPER_ADMIN)
   @Patch(":id")
   @ApiOperation({ summary: "Update admin by ID (only super admin)" })
   @ApiResponse({ status: 200, description: "Admin muvaffaqiyatli yangilandi" })
-  update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
+  update(@Param("id", new ParseUUIDPipe()) id: string, @Body() updateAdminDto: UpdateAdminDto) {
     const updated = this.adminsService.update(id, updateAdminDto);
-    return successRes(updated);
+    return updated;
   }
 
   @Roles(RolesEnum.SUPER_ADMIN)
   @Delete(":id")
   @ApiOperation({ summary: "Delete admin by ID (only super admin)" })
   @ApiResponse({ status: 200, description: "Admin muvaffaqiyatli o'chirildi" })
-  remove(@Param("id") id: string) {
+  remove(@Param("id", new ParseUUIDPipe()) id: string) {
     const result = this.adminsService.remove(id);
-    return successRes(result);
+    return result;
   }
 }

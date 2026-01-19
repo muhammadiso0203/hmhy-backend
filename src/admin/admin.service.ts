@@ -8,6 +8,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Admin } from "./entities/admin.entity";
+import { Teacher } from "../teacher/entities/teacher.entity";
+import { Student } from "../student/entities/student.entity";
+import { Lesson } from "../lesson/entities/lesson.entity";
+import { Transaction } from "../transaction/entities/transaction.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { UpdateAdminDto } from "./dto/update-admin.dto";
 import { RolesEnum } from "src/common/enum";
@@ -18,8 +22,34 @@ export class AdminService {
   constructor(
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
+    @InjectRepository(Teacher)
+    private readonly teacherRepository: Repository<Teacher>,
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository<Student>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepository: Repository<Lesson>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
     private readonly crypto: CryptoService,
-  ) {}
+  ) { }
+
+  async getStatistics() {
+    const teacherCurrentLength = await this.teacherRepository.count({
+      where: { isDelete: false },
+    });
+    const studentCurrentLength = await this.studentRepository.count();
+    const lessonCurrentLength = await this.lessonRepository.count();
+    const earningCurrentLength = await this.transactionRepository.count({
+      where: { state: 'PAID' },
+    });
+
+    return {
+      teacher: { length: teacherCurrentLength },
+      student: { length: studentCurrentLength },
+      lesson: { length: lessonCurrentLength },
+      earning: { length: earningCurrentLength },
+    };
+  }
 
   async onModuleInit() {
     const superAdmin = await this.adminRepository.findOne({
@@ -43,7 +73,7 @@ export class AdminService {
   }
 
   async create(createAdminDto: CreateAdminDto) {
-    const { username, password } = createAdminDto;
+    const { username, password, phoneNumber } = createAdminDto;
 
     const existingAdmin = await this.adminRepository.findOneBy({ username });
     if (existingAdmin) {
@@ -54,8 +84,9 @@ export class AdminService {
 
     const newAdmin = this.adminRepository.create({
       username,
+      phoneNumber,
       password: hashedPassword,
-      role: RolesEnum.ADMIN, 
+      role: RolesEnum.ADMIN,
     });
 
     return await this.adminRepository.save(newAdmin);

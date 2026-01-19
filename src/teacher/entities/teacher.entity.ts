@@ -51,6 +51,9 @@ export class Teacher {
   level: string;
 
   @Column({ type: "text", nullable: true })
+  reason?: string;
+
+  @Column({ type: "text", nullable: true })
   description: string;
 
   @Column({ type: "int", default: 0 })

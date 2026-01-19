@@ -10,12 +10,14 @@ import { successRes } from "src/common/response/succesResponse";
 import { UpdateTeacherMeDto } from "./dto/updateTeacherMe.dto";
 import { UpdateTeacherDto } from "./dto/update-teacher.dto";
 import { UpdateRatingDto } from "./dto/updateRating.dto";
+import { DeletedTeachersService } from "src/deletedTeacher/deletedTeacher.service";
 
 @Injectable()
 export class TeacherService {
   constructor(
     @InjectRepository(Teacher)
-    private readonly teacherRepo: Repository<Teacher>
+    private readonly teacherRepo: Repository<Teacher>,
+    private readonly deletedTeachersService: DeletedTeachersService
   ) { }
 
   async create(data: Partial<Teacher>): Promise<Teacher> {
@@ -39,7 +41,10 @@ export class TeacherService {
 
   async findDeletedTeachers() {
     const teachers = await this.teacherRepo.find({
-      where: { isDelete: true },
+      where: { isDelete: true, },
+      order: {
+        updatedAt: 'DESC'
+      }
     });
     return successRes(teachers);
   }
@@ -83,13 +88,21 @@ export class TeacherService {
     return await this.teacherRepo.save(teacher);
   }
 
-  async softDeleteTeacher(id: string) {
+  async softDeleteTeacher(id: string, reason: string, deletedBy: string) {
     const teacher = await this.teacherRepo.findOne({ where: { id } });
     if (!teacher) {
       throw new NotFoundException("Teacher not found");
     }
     teacher.isDelete = true;
+    teacher.reason = reason;
     await this.teacherRepo.save(teacher);
+
+    await this.deletedTeachersService.create({
+      teacher: id,
+      deletedBy,
+      reason,
+    });
+
     return successRes({ message: "Teacher soft deleted successfully" });
   }
 

@@ -20,14 +20,14 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { successRes } from "../common/response/succesResponse"; // yo'lni o'zingizga moslashtiring
 
 @ApiTags("transactions")
-@ApiBearerAuth('access-token')
+// @ApiBearerAuth('access-token')
 @Controller("transactions")
-@UseGuards(JwtAuthGuard, RolesGuard)
+// @UseGuards(JwtAuthGuard, RolesGuard)
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) { }
 
   @Post()
-  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Yangi tranzaksiya yaratish" })
   @ApiResponse({
     status: 201,
@@ -36,16 +36,16 @@ export class TransactionController {
   @ApiResponse({ status: 400, description: "Yaroqsiz ma'lumotlar" })
   async create(@Body() createDto: CreateTransactionDto) {
     const result = await this.transactionService.create(createDto);
-    return successRes(result, 201);
+    return result;
   }
 
   @Get()
-  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Barcha tranzaksiyalarni olish" })
   @ApiResponse({ status: 200, description: "Barcha tranzaksiyalar ro'yxati" })
   async findAll() {
     const result = await this.transactionService.findAll();
-    return successRes(result);
+    return result;
   }
 
   @Get(":id")
@@ -55,7 +55,7 @@ export class TransactionController {
   @ApiResponse({ status: 404, description: "Tranzaksiya topilmadi" })
   async findOne(@Param("id") id: string) {
     const result = await this.transactionService.findOne(id);
-    return successRes(result);
+    return result;
   }
 
   @Patch(":id")
@@ -67,7 +67,7 @@ export class TransactionController {
     @Body() updateDto: UpdateTransactionDto
   ) {
     const result = await this.transactionService.update(id, updateDto);
-    return successRes(result);
+    return result;
   }
 
   @Delete(":id")
@@ -76,6 +76,6 @@ export class TransactionController {
   @ApiResponse({ status: 200, description: "Tranzaksiya o'chirildi" })
   async remove(@Param("id") id: string) {
     const result = await this.transactionService.remove(id);
-    return successRes(result);
+    return result;
   }
 }

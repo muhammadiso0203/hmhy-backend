@@ -24,8 +24,7 @@ export class AuthTeacherService {
     private readonly jwtService: JwtService,
     @InjectRepository(Teacher)
     private readonly teacherRepo: Repository<Teacher>,
-    private readonly mailService: MailService,
-
+    private readonly mailService: MailService
   ) {}
 
   async generateTokens(payloadData: { id: string; role: string }) {
@@ -142,6 +141,7 @@ export class AuthTeacherService {
 
       await this.teachersService.updateRefreshToken(payload.id, null);
 
+
       res.clearCookie("refresh_token");
 
       return { message: "User logged out successfully" };
@@ -160,6 +160,7 @@ export class AuthTeacherService {
         image: reqUser.picture,
         isActive: true,
         password: "",
+        isDelete: false,
       });
     }
 
@@ -172,7 +173,7 @@ export class AuthTeacherService {
     );
 
     res.cookie("refresh_token", refreshToken, {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: Number(process.env.COOKIE_TIME) || 15 * 24 * 60 * 60 * 1000,
       secure: process.env.NODE_ENV === "production",
     });
@@ -197,7 +198,7 @@ export class AuthTeacherService {
 
     const otpExpires = new Date(Date.now() + 2 * 60 * 1000);
 
-    await this.teachersService.updateTeacher(teacherId, {
+    await this.teacherRepo.update(teacherId, {
       phoneNumber: dto.phone,
       password: hashedPassword,
       otpCode: otpCode,
@@ -205,7 +206,7 @@ export class AuthTeacherService {
     });
 
     await this.mailService.sendMail(teacher.email, teacher.fullName, otpCode);
-    console.log(`SMS yuborildi: ${dto.phone} -> Kod: ${otpCode}`);
+    console.log(`Email yuborildi: ${dto.phone} -> Kod: ${otpCode}`);
 
     return {
       success: true,
@@ -220,8 +221,10 @@ export class AuthTeacherService {
     );
 
     const updateData: any = {};
-    if (googleUser.accessToken) updateData.googleAccessToken = googleUser.accessToken;
-    if (googleUser.refreshToken) updateData.googleRefreshToken = googleUser.refreshToken;
+    if (googleUser.accessToken)
+      updateData.googleAccessToken = googleUser.accessToken;
+    if (googleUser.refreshToken)
+      updateData.googleRefreshToken = googleUser.refreshToken;
 
     if (!teacher) {
       teacher = await this.teachersService.create({
@@ -232,9 +235,9 @@ export class AuthTeacherService {
         ...updateData,
       });
     } else {
-        if (Object.keys(updateData).length > 0) {
-            await this.teacherRepo.update(teacher.id, updateData);
-        }
+      if (Object.keys(updateData).length > 0) {
+        await this.teacherRepo.update(teacher.id, updateData);
+      }
     }
 
     return teacher;
@@ -244,22 +247,27 @@ export class AuthTeacherService {
     const teacher = await this.teacherRepo
       .createQueryBuilder("teacher")
       .where("teacher.id = :id", { id: dto.teacherId })
-      .addSelect("teacher.otpCode")
-      .addSelect("teacher.otpExpires")
+      .addSelect(["teacher.otpCode", "teacher.otpExpires"])
       .getOne();
 
     if (!teacher) {
       throw new NotFoundException("O'qituvchi topilmadi");
     }
 
-    if (teacher.otpCode !== dto.otpCode) {
-      throw new BadRequestException("Tasdiqlash kodi noto'g'ri");
+    if (!teacher.otpExpires || new Date() > teacher.otpExpires) {
+      throw new BadRequestException(
+        "OTP kodning amal qilish muddati tugagan. Iltimos, kodni qayta so'rang."
+      );
     }
 
-    if (new Date() > teacher.otpExpires) {
+    if (!teacher.otpCode) {
       throw new BadRequestException(
-        "Kodning muddati tugagan, qaytadan yuboring"
+        "OTP kod topilmadi. Ehtimol allaqachon ishlatilgan yoki saqlanmagan"
       );
+    }
+
+    if (teacher.otpCode !== dto.otpCode) {
+      throw new BadRequestException("Tasdiqlash kodi noto'g'ri");
     }
 
     await this.teachersService.updateTeacher(teacher.id, {
@@ -275,6 +283,7 @@ export class AuthTeacherService {
     await this.teachersService.updateTeacher(teacher.id, {
       refreshToken: hashedRefreshToken,
     });
+
 
     return {
       success: true,
@@ -308,7 +317,8 @@ export class AuthTeacherService {
 
     return {
       isConnected: !!teacher.googleRefreshToken,
-      googleEmail: teacher.email, // Assuming google login uses same email, or we could store google email separately if needed.
+      googleEmail: teacher.email,
+      id: teacher.id, // Assuming google login uses same email, or we could store google email separately if needed.
     };
   }
 }

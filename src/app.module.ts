@@ -14,7 +14,7 @@ import { LessonHistoryModule } from "./lessonHistory/lessonHistory.module";
 import { TransactionModule } from "./transaction/transaction.module";
 import { TeacherPaymentModule } from "./teacherPayment/teacherPayment.module";
 import { PaymentModule } from "./payment/payment.module";
-import { BotModule } from "./bot/bot.module";
+// import { BotModule } from "./bot/bot.module";
 
 @Module({
   imports: [
@@ -47,7 +47,7 @@ import { BotModule } from "./bot/bot.module";
     TransactionModule,
     TeacherPaymentModule,
     PaymentModule,
-    BotModule,
+    // BotModule,
   ],
   controllers: [],
   providers: [],

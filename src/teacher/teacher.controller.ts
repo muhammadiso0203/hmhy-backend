@@ -26,18 +26,20 @@ import { CurrentUser } from "src/common/decorators/currentUser";
 import { UpdateRatingDto } from "./dto/updateRating.dto";
 import { UpdateTeacherMeDto } from "./dto/updateTeacherMe.dto";
 import { IToken } from "src/common/token/interface";
-import { successRes } from "src/common/response/succesResponse"; 
+import { successRes } from "src/common/response/succesResponse";
+import { DeleteTeacherDto } from "./dto/delete-teacher.dto";
 
 @ApiTags('Teacher')
 @Controller('teacher')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth("access-token")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get all teachers with full details' })
-  @Roles(RolesEnum.ADMIN)
-  @ApiBearerAuth()
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  // @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: "Get all teachers successfully",
@@ -49,7 +51,7 @@ export class TeacherController {
   })
   async findAll() {
     const result = await this.teacherService.findAllTeachers();
-    return successRes(result);
+    return result;
   }
 
   @Get('active')
@@ -61,12 +63,12 @@ export class TeacherController {
   })
   async findActive() {
     const result = await this.teacherService.findActiveTeachers();
-    return successRes(result);
+    return result;
   }
 
   @Get('deleted')
   @ApiOperation({ summary: 'Get all deleted teachers' })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
@@ -79,13 +81,13 @@ export class TeacherController {
   })
   async findDeleted() {
     const result = await this.teacherService.findDeletedTeachers();
-    return successRes(result);
+    return result;
   }
 
   @Get('me')
   @ApiOperation({ summary: 'Get current teacher profile' })
   @Roles(TeacherRole.TEACHER, TeacherRole.ADMIN)
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiResponse({
     status: 200,
     description: "Get teacher profile successfully",
@@ -97,13 +99,13 @@ export class TeacherController {
   })
   async getProfile(@CurrentUser() user: IToken) {
     const result = await this.teacherService.findTeacherProfile(user.id);
-    return successRes(result);
+    return result;
   }
 
   @Patch('me')
   @ApiOperation({ summary: 'Update current teacher profile' })
   @Roles(TeacherRole.TEACHER, TeacherRole.ADMIN)
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiBody({ type: UpdateTeacherMeDto })
   @ApiResponse({
     status: 200,
@@ -122,7 +124,7 @@ export class TeacherController {
       user.id,
       updateTeacherMeDto
     );
-    return successRes(result);
+    return result;
   }
 
   @Get(':id')
@@ -135,7 +137,7 @@ export class TeacherController {
   @ApiResponse({ status: 404, description: "Teacher not found" })
   async findOne(@Param("id", ParseUUIDPipe) id: string) {
     const result = await this.teacherService.findOne(id);
-    return successRes(result);
+    return result;
   }
 
   @Patch(':id')
@@ -161,13 +163,13 @@ export class TeacherController {
       id,
       updateTeacherDto
     );
-    return successRes(result);
+    return result;
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Soft delete teacher' })
-  @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, TeacherRole.ADMIN, 'ID')
-  @ApiBearerAuth()
+  // @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, TeacherRole.ADMIN, 'ID')
+  // @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: "Teacher soft deleted successfully",
@@ -178,14 +180,22 @@ export class TeacherController {
     description: "Forbidden - Admin or Teacher access required",
   })
   @ApiResponse({ status: 404, description: "Teacher not found" })
-  async remove(@Param("id", ParseUUIDPipe) id: string) {
-    const result = await this.teacherService.softDeleteTeacher(id);
-    return successRes(result);
+  async remove(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() deleteTeacherDto: DeleteTeacherDto,
+    @CurrentUser() user: IToken
+  ) {
+    const result = await this.teacherService.softDeleteTeacher(
+      id,
+      deleteTeacherDto.reason,
+      user.id
+    );
+    return result;
   }
 
   @Patch(':id/activate')
   @ApiOperation({ summary: 'Activate/deactivate teacher for students' })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
@@ -199,7 +209,7 @@ export class TeacherController {
   @ApiResponse({ status: 404, description: "Teacher not found" })
   async activate(@Param("id", ParseUUIDPipe) id: string) {
     const result = await this.teacherService.activateTeacher(id);
-    return successRes(result);
+    return result;
   }
 
   @Patch(":id/rating")
@@ -217,12 +227,12 @@ export class TeacherController {
     @Body() updateRatingDto: UpdateRatingDto
   ) {
     const result = await this.teacherService.updateRating(id, updateRatingDto);
-    return successRes(result);
+    return result;
   }
 
   @Post(':id/restore')
   @ApiOperation({ summary: 'Restore deleted teacher' })
-  @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, TeacherRole.ADMIN, 'ID')
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN, TeacherRole.TEACHER, TeacherRole.ADMIN, 'ID')
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
@@ -236,13 +246,13 @@ export class TeacherController {
   @ApiResponse({ status: 404, description: "Teacher not found" })
   async restore(@Param("id", ParseUUIDPipe) id: string) {
     const result = await this.teacherService.restoreTeacher(id);
-    return successRes(result);
+    return result;
   }
 
   @Delete(":id/hard")
   @ApiOperation({ summary: "Hard delete teacher - permanently delete" })
-  @Roles(RolesEnum.SUPER_ADMIN)
-  @ApiBearerAuth()
+  // @Roles(RolesEnum.SUPER_ADMIN)
+  // @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: "Teacher permanently deleted successfully",
@@ -255,6 +265,6 @@ export class TeacherController {
   @ApiResponse({ status: 404, description: "Teacher not found" })
   async hardDelete(@Param("id", ParseUUIDPipe) id: string) {
     const result = await this.teacherService.hardDeleteTeacher(id);
-    return successRes(result);
+    return result;
   }
 }

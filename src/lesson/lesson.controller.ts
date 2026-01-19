@@ -27,36 +27,36 @@ import { successRes } from "../common/response/succesResponse"; // yo'lni o'zing
 
 @ApiTags("lessons")
 @Controller("lessons")
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth("access-token")
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @ApiBearerAuth("access-token")
 export class LessonController {
-  constructor(private readonly lessonsService: LessonService) { }
+  constructor(private readonly lessonsService: LessonService) {}
 
-  @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Yangi dars yaratish" })
   @Post()
   async create(@Body() createLessonDto: CreateLessonDto) {
     const result = await this.lessonsService.create(createLessonDto);
-    return successRes(result, 201);
+    return result;
   }
 
-  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Barcha darslar ro'yxatini olish (Admin uchun)" })
   @Get()
   async findAll() {
     const result = await this.lessonsService.findAll();
-    return successRes(result);
+    return result;
   }
 
-  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Get all lessons with filters (Admin only)" })
   @Get("admin/all")
   async findAllAdmin(@Query() filters: LessonFilterDto) {
     const result = await this.lessonsService.findAllAdmin(filters);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Get teacher lessons (Admin only)" })
   @Get("admin/teacher/:teacherId")
   async findByTeacherAdmin(
@@ -67,26 +67,26 @@ export class LessonController {
       teacherId,
       filters
     );
-    return successRes(result);
+    return result;
   }
 
-  @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Get my lessons (Teacher only)" })
   @Get("teacher/my")
   async findMyLessons(@CurrentUser() user: IToken) {
     const result = await this.lessonsService.findMyLessons(user.id);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Get my booked lessons (Teacher only)" })
   @Get("teacher/my/booked")
   async findMyBookedLessons(@CurrentUser() user: IToken) {
     const result = await this.lessonsService.findMyBookedLessons(user.id);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Get my lessons by date range (for week calendar)" })
   @Get("teacher/my/by-date-range")
   async findMyLessonsByDateRange(
@@ -94,18 +94,18 @@ export class LessonController {
     @Query() range: DateRangeQueryDto
   ) {
     const result = await this.lessonsService.findMyByDateRange(user.id, range);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, RolesEnum.STUDENT, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, RolesEnum.STUDENT, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "ID bo'yicha dars ma'lumotlarini olish" })
   @Get(":id")
   async findOne(@Param("id") id: string) {
     const result = await this.lessonsService.findOne(id);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Dars ma'lumotlarini yangilash" })
   @Patch(":id")
   async update(
@@ -113,32 +113,32 @@ export class LessonController {
     @Body() updateLessonDto: UpdateLessonDto
   ) {
     const result = await this.lessonsService.update(id, updateLessonDto);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Mark lesson as completed (Teacher only)" })
   @Patch(":id/complete")
   async complete(@Param("id") id: string, @CurrentUser() user: IToken) {
     const result = await this.lessonsService.completeLesson(id, user.id);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(RolesEnum.STUDENT, TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.STUDENT, TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({
     summary: "Rate a completed lesson (Student via Telegram)",
   })
   @Post(":id/rate")
   async rateLesson(@Param("id") id: string, @Body() dto: RateLessonDto) {
     const result = await this.lessonsService.rateLesson(id, dto);
-    return successRes(result);
+    return result;
   }
 
-  @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
+  // @Roles(TeacherRole.TEACHER, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Darsni o'chirib tashlash" })
   @Delete(":id")
   async remove(@Param("id") id: string) {
     const result = await this.lessonsService.remove(id);
-    return successRes(result);
+    return result;
   }
 }

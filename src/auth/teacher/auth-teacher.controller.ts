@@ -30,7 +30,7 @@ import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { CurrentUser } from "../../common/decorators/currentUser";
 import { IToken } from "../../common/token/interface";
 import { ApiBearerAuth } from "@nestjs/swagger";
-import { successRes } from "../../common/response/succesResponse"; // yo'lni o'zingizga moslashtiring
+import { successRes } from "../../common/response/succesResponse";
 
 @ApiTags("Teacher Auth")
 @ApiBearerAuth("access-token")
@@ -80,7 +80,6 @@ export class AuthTeacherController {
 
   @Get("google-calendar-status")
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Check Google Calendar connection status" })
   async getGoogleCalendarStatus(@CurrentUser() user: IToken) {
     const result = await this.authService.checkGoogleCalendarStatus(user.id);
@@ -119,11 +118,12 @@ export class AuthTeacherController {
               .status(500)
               .json({ error: "Login failed", details: loginErr });
           }
-          return res.redirect("/dashboard");
+          return res.redirect("/teacher/dashboard");
         });
       }
     )(req, res);
   }
+
 
   // Google OAuth endpoints
   @Get("google")
@@ -152,7 +152,6 @@ export class AuthTeacherController {
               .status(500)
               .json({ error: "Login failed", details: loginErr });
           }
-          return res.redirect("/dashboard");
         });
       }
     )(req, res);
@@ -164,10 +163,13 @@ export class AuthTeacherController {
   @ApiResponse({ status: 200, description: "Google authentication successful" })
   async googleCallback(@Req() req, @Res() res) {
     const { user, step } = req.user;
+    console.log("GOOGLE CALLBACK KELDI!");
+    console.log("Query params:", req.query);
+    console.log("req.user:", req.user);
 
     if (step == 2) {
       return res.redirect(
-        `http://localhost:3030/auth/teacher/register/step2/${user.id}`
+        `http://localhost:5173/teacher/register/step2/${user.id}`
       );
     }
 
@@ -197,7 +199,7 @@ export class AuthTeacherController {
         path: "/",
       });
 
-      return res.redirect(`http://localhost:3030/teacher/dashboard`);
+      return res.redirect(`http://localhost:5173/teacher/dashboard`);
     }
 
     if (step === "inactive") {
@@ -227,11 +229,10 @@ export class AuthTeacherController {
       });
 
       return res.redirect(
-        `http://localhost:3030/login/teacher?error=account_inactive`
+        `http://localhost:5173/login/teacher?error=account_inactive`
       );
     }
 
-    // Agar boshqa holat bo'lsa
     const fallbackResult = {
       message: "Google login muvaffaqiyatli",
       step: step,
@@ -256,28 +257,45 @@ export class AuthTeacherController {
     return successRes(result);
   }
 
+
   @Post("register/step3")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "3-qadam: OTP kodni tasdiqlash",
-    description:
-      "Telefon orqali kelgan 6 xonali kodni tekshirish va akkauntni faollashtirish",
-  })
-  @ApiBody({ type: RegisterStep3Dto })
-  @ApiResponse({
-    status: 200,
-    description: "Profil muvaffaqiyatli faollashtirildi",
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Kod noto'g'ri yoki muddati o'tgan",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Foydalanuvchi topilmadi",
-  })
-  async registerStep3(@Body() dto: RegisterStep3Dto) {
+  @ApiOperation({ summary: "3-qadam: OTP kodni tasdiqlash" })
+  async registerStep3(
+    @Body() dto: RegisterStep3Dto,
+    @Res({ passthrough: true }) res: Response // Response'ni qo'shamiz
+  ) {
+    // 1. OTP'ni tekshirish va foydalanuvchini faollashtirish
     const result = await this.authService.registerStep3(dto);
-    return successRes(result);
+
+    // 2. Agar hammasi yaxshi bo'lsa, tokenlarni generatsiya qilamiz
+    // result ichida teacherId qaytishi kerak (yoki dto.teacherId dan foydalanamiz)
+    const jwtTokens = await this.authService.generateTokens({
+      id: dto.teacherId,
+      role: "TEACHER",
+    });
+
+    // 3. Cookie'larni o'rnatamiz (Dashboard'ga ruxsat berish uchun)
+    res.cookie("access_token", jwtTokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: TimeUtils.toMilliseconds(process.env.ACCESS_TOKEN_TIME || "15m"),
+      path: "/",
+    });
+
+    res.cookie("refresh_token", jwtTokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: TimeUtils.toMilliseconds(process.env.REFRESH_TOKEN_TIME || "7d"),
+      path: "/",
+    });
+
+    // 4. Frontend'ga muvaffaqiyat xabarini yuboramiz
+    return successRes({
+      message: "Profil faollashtirildi va tizimga kirildi",
+      accessToken: jwtTokens.accessToken, // Frontend'dagi localStorage uchun
+    });
   }
 }

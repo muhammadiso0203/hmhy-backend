@@ -20,8 +20,8 @@ import { RolesEnum } from "../common/enum";
 import { successRes } from "../common/response/succesResponse";
 
 @ApiTags("deleted-teachers")
-@ApiBearerAuth("access-token") // Swaggerda "Authorize" tugmasi chiqishi uchun
-@Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN) // Faqat Admin va SuperAdmin kira oladi
+// @ApiBearerAuth("access-token") // Swaggerda "Authorize" tugmasi chiqishi uchun
+// @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN) // Faqat Admin va SuperAdmin kira oladi
 @Controller("deleted-teachers")
 @UseGuards(JwtAuthGuard, RolesGuard) // Avval Token tekshiriladi, keyin Rol
 export class DeletedTeachersController {
