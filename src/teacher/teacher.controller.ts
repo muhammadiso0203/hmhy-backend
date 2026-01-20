@@ -31,14 +31,14 @@ import { DeleteTeacherDto } from "./dto/delete-teacher.dto";
 
 @ApiTags('Teacher')
 @Controller('teacher')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth("access-token")
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @ApiBearerAuth("access-token")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get all teachers with full details' })
-  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   // @ApiBearerAuth()
   @ApiResponse({
     status: 200,
@@ -69,7 +69,7 @@ export class TeacherController {
   @Get('deleted')
   @ApiOperation({ summary: 'Get all deleted teachers' })
   @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
-  @ApiBearerAuth()
+  // @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: "Get deleted teachers successfully",
@@ -87,7 +87,7 @@ export class TeacherController {
   @Get('me')
   @ApiOperation({ summary: 'Get current teacher profile' })
   @Roles(TeacherRole.TEACHER, TeacherRole.ADMIN)
-  @ApiBearerAuth('access-token')
+  // @ApiBearerAuth('access-token')
   @ApiResponse({
     status: 200,
     description: "Get teacher profile successfully",
@@ -143,7 +143,6 @@ export class TeacherController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update teacher (Admin, Teacher only)' })
   @Roles(RolesEnum.ADMIN, TeacherRole.TEACHER, TeacherRole.ADMIN, 'ID')
-  @ApiBearerAuth()
   @ApiBody({ type: UpdateTeacherDto })
   @ApiResponse({
     status: 200,

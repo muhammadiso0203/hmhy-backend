@@ -56,8 +56,7 @@ export class StudentsController {
     return this.studentsService.findAll();
   }
 
-  // @UseGuards(JwtAuthGuard, JwtSelfGuard)
-  // @Roles(RolesEnum.SUPER_ADMIN)
+  @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Students stats" })
   @ApiResponse({ status: 200, description: "Students stats" })
   @Get("stats")
@@ -84,7 +83,6 @@ export class StudentsController {
     return profile;
   }
 
-  @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Student block" })
   @ApiResponse({ status: 200, description: "Student blocked" })
@@ -97,7 +95,6 @@ export class StudentsController {
     return result
   }
 
-  @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @Roles(RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Student unblock" })
   @ApiResponse({ status: 200, description: "Student unblocked" })
@@ -107,7 +104,6 @@ export class StudentsController {
     return result
   }
 
-  // @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @ApiOperation({ summary: "ID bo'yicha bitta talabani olish" })
   @ApiResponse({ status: 200, description: "Talaba topildi" })
   @ApiResponse({ status: 404, description: "Talaba topilmadi" })
@@ -117,7 +113,6 @@ export class StudentsController {
     return result
   }
 
-  // @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @ApiOperation({ summary: "ID bo'yicha talabani yangilash" })
   @ApiResponse({ status: 200, description: "Talaba yangilandi" })
   @Patch(":id")
@@ -125,7 +120,6 @@ export class StudentsController {
     return this.studentsService.update(id, updateStudentDto);
   }
 
-  // @UseGuards(JwtAuthGuard, JwtSelfGuard)
   @ApiOperation({ summary: "ID bo'yicha talabani o'chirish" })
   @ApiResponse({ status: 200, description: "Talaba o'chirildi" })
   @Delete(":id")

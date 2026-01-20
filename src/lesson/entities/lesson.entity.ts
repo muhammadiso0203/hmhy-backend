@@ -49,7 +49,7 @@ export class Lesson {
   @Column({ type: "uuid", nullable: true })
   teacherPayment: string;
 
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: "varchar", nullable: true, })
   meetingUrl: string | null;
 
   @Column({ type: "timestamp", nullable: true })

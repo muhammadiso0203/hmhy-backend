@@ -26,13 +26,14 @@ import { RolesEnum } from "src/common/enum";
 import { successRes } from "../common/response/succesResponse";
 
 @ApiTags("Admin")
-@ApiBearerAuth("access-token")
-@UseGuards(JwtAuthGuard, RolesGuard)
+// @ApiBearerAuth("access-token")
+// @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("admin")
 export class AdminController {
   constructor(private readonly adminsService: AdminService) { }
 
   @Get("me")
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Get current admin profile" })
   @ApiResponse({ status: 200, description: "Profil muvaffaqiyatli olindi" })
   async getProfile(@Request() req) {

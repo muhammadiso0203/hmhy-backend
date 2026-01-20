@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TeacherModule } from "./teacher/teacher.module";
 import { Teacher } from "./teacher/entities/teacher.entity";
-import { AuthModule } from "./auth/auth.module";
 import { AdminModule } from "./admin/admin.module";
 import { StudentModule } from "./student/student.module";
 import { LessonTemplateModule } from "./lessonTemplate/lessonTemplate.module";
@@ -14,6 +13,7 @@ import { LessonHistoryModule } from "./lessonHistory/lessonHistory.module";
 import { TransactionModule } from "./transaction/transaction.module";
 import { TeacherPaymentModule } from "./teacherPayment/teacherPayment.module";
 import { PaymentModule } from "./payment/payment.module";
+import { AuthModule } from "./auth/auth.module";
 // import { BotModule } from "./bot/bot.module";
 
 @Module({
@@ -28,9 +28,6 @@ import { PaymentModule } from "./payment/payment.module";
         autoLoadEntities: true,
         synchronize: true,
         logging: false,
-        ssl: {
-          rejectUnauthorized: false,
-        },
       }),
     }),
     DeletedTeacher,

@@ -20,6 +20,8 @@ import { successRes } from "../common/response/succesResponse"; // yo'lni o'zing
 
 @ApiTags("lesson-history")
 @Controller("lesson-history")
+@UseGuards(JwtAuthGuard,RolesGuard)
+@ApiBearerAuth("access-token")
 export class LessonHistoryController {
   constructor(private readonly lessonHistoryService: LessonHistoryService) { }
 

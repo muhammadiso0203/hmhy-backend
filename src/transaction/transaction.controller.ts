@@ -21,13 +21,13 @@ import { successRes } from "../common/response/succesResponse"; // yo'lni o'zing
 
 @ApiTags("transactions")
 // @ApiBearerAuth('access-token')
-@Controller("transactions")
 // @UseGuards(JwtAuthGuard, RolesGuard)
+@Controller("transactions")
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) { }
 
   @Post()
-  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Yangi tranzaksiya yaratish" })
   @ApiResponse({
     status: 201,
@@ -40,7 +40,7 @@ export class TransactionController {
   }
 
   @Get()
-  // @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
+  @Roles(RolesEnum.ADMIN, RolesEnum.SUPER_ADMIN)
   @ApiOperation({ summary: "Barcha tranzaksiyalarni olish" })
   @ApiResponse({ status: 200, description: "Barcha tranzaksiyalar ro'yxati" })
   async findAll() {
