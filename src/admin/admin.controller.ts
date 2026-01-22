@@ -27,7 +27,7 @@ import { successRes } from "../common/response/succesResponse";
 
 @ApiTags("Admin")
 // @ApiBearerAuth("access-token")
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("admin")
 export class AdminController {
   constructor(private readonly adminsService: AdminService) { }
@@ -94,7 +94,7 @@ export class AdminController {
     return admin;
   }
 
-  @Roles(RolesEnum.SUPER_ADMIN)
+  // @Roles(RolesEnum.SUPER_ADMIN)
   @Patch(":id")
   @ApiOperation({ summary: "Update admin by ID (only super admin)" })
   @ApiResponse({ status: 200, description: "Admin muvaffaqiyatli yangilandi" })

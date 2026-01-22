@@ -31,7 +31,7 @@ import { DeleteTeacherDto } from "./dto/delete-teacher.dto";
 
 @ApiTags('Teacher')
 @Controller('teacher')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 // @ApiBearerAuth("access-token")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) { }
